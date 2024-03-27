@@ -1,0 +1,28 @@
+firebase:
+  service-account: classpath:ashs-e1731-firebase-adminsdk-oi9es-9af2d1075c.json
+spring:
+  application:
+    name: instagram-service
+  cloud:
+    config:
+      enabled: false
+    openfeign:
+      client:
+        config:
+          instagram-api:
+            url: http://localhost:8090
+          instagram-graph:
+            url: http://localhost:8090
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    enabled: false
+
+instagram:
+  api:
+    redirect_uri: http://localhost:8083/instagram/callback
+    client_id: client_id
+    client_secret: client_secret
