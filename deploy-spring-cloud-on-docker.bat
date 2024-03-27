@@ -5,7 +5,7 @@ SETLOCAL EnableDelayedExpansion
 cd C:\Users\bbseb\Documents\programmation\ashs\backend
 
 :: Etape 1: Commit et push sur GitHub
-cd config-repo
+cd config-repository
 echo Commit et push des modifications sur GitHub...
 git add .
 git commit -m "Mise à jour des services"

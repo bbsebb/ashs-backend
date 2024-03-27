@@ -20,8 +20,6 @@ services:
     environment:
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:8888
-      - SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=${SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME}
-      - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=${SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
       interval: 10s
@@ -47,7 +45,7 @@ services:
       config-service:
         condition: service_healthy
   test-service:
-    build: ./test
+    build: ./test-service
     container_name: test-service
     ports:
       - "8081:8081"
@@ -75,6 +73,23 @@ services:
       - CONFIG_SERVICE_URL=http://config-service:8888
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      retries: 4
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+  instagram-service:
+    build: ./instagram-service
+    container_name: instagram-service
+    ports:
+      - "8083:8083"
+    expose:
+      - "8083"
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
       interval: 10s
       retries: 4
     depends_on:

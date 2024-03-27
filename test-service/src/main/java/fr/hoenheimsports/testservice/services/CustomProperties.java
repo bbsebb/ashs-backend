@@ -1,4 +1,4 @@
-package fr.hoenheimsports.test.services;
+package fr.hoenheimsports.testservice.services;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

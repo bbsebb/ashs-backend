@@ -1,6 +1,6 @@
-package fr.hoenheimsports.test.controllers;
+package fr.hoenheimsports.testservice.controllers;
 
-import fr.hoenheimsports.test.services.CustomProperties;
+import fr.hoenheimsports.testservice.services.CustomProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
