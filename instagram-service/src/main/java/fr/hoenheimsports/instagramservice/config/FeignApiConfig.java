@@ -1,6 +1,7 @@
 package fr.hoenheimsports.instagramservice.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Logger;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
@@ -30,5 +31,6 @@ public class FeignApiConfig {
     public Encoder encoder(ObjectFactory<HttpMessageConverters> converters) {
         return new SpringFormEncoder(new SpringEncoder(converters));
     }
+
 
 }

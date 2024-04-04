@@ -15,6 +15,7 @@ echo %cd%
 
 :: Etape 2: Build des services avec Gradle
 echo Construction des services Spring Boot avec Gradle...
+for /f "delims=" %%a in (.env) do set %%a
 FOR /D %%d IN (*) DO (
     IF EXIST %%d\build.gradle (
         cd %%d

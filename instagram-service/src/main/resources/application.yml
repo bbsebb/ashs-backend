@@ -5,3 +5,11 @@ spring:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
 server:
   port: 8083
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          openfeign: DEBUG
+    feign:
+      client: DEBUG
