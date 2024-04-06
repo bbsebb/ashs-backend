@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-service
+  template:
+    metadata:
+      labels:
+        app: config-service
+    spec:
+      containers:
+      - name: config-service
+        image: bbsebb/backend-config-service:v1
+        ports:
+        - containerPort: 8888
+        env:
+        - name: DISCOVERY_SERVICE_URL
+          value: http://discovery-service:8761/eureka
+        - name: CONFIG_SERVICE_URL
+          value: http://config-service:8888
+        - name: KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keystore-password
+              key: password
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8888
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-service
+spec:
+  selector:
+    app: config-service
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
