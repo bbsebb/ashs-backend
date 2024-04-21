@@ -1,0 +1,10 @@
+services:
+  fluent-bit:
+    image: mon-fluent-bit:latest
+    container_name: fluent-bit
+    build:
+      context: .
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    restart: unless-stopped
