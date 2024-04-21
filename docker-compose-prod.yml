@@ -1,6 +1,6 @@
 services:
   discovery-service:
-    image: bbsebb/backend-discovery-service:latest
+    image: bbsebb/backend-discovery-service:v1.0
     container_name: discovery-service
     restart: unless-stopped
     logging:
@@ -19,7 +19,7 @@ services:
       interval: 10s
       retries: 4
   config-service:
-    image: bbsebb/backend-config-service:latest
+    image: bbsebb/backend-config-service:v1.0
     container_name: config-service
     restart: unless-stopped
     logging:
@@ -44,7 +44,7 @@ services:
       discovery-service:
         condition: service_healthy
   gateway-service:
-    image: bbsebb/backend-gateway-service:latest
+    image: bbsebb/backend-gateway-service:v1.0
     container_name: gateway-service
     restart: unless-stopped
     logging:
@@ -68,7 +68,7 @@ services:
       config-service:
         condition: service_healthy
   contact-service:
-    image: bbsebb/backend-contact-service:latest
+    image: bbsebb/backend-contact-service:v1.0
     container_name: contact-service
     restart: unless-stopped
     logging:
@@ -92,7 +92,7 @@ services:
       gateway-service:
         condition: service_healthy
   instagram-service:
-    image: bbsebb/backend-instagram-service:latest
+    image: bbsebb/backend-instagram-service:v1.0
     container_name: instagram-service
     restart: unless-stopped
     logging:

@@ -38,7 +38,7 @@ class EmailControllerTest {
         Mockito.doNothing().when(emailService).sendEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJson))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -55,7 +55,7 @@ class EmailControllerTest {
                                         """;
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJsonMissingField))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -72,7 +72,7 @@ class EmailControllerTest {
                                         """;
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJsonMissingField))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -89,7 +89,7 @@ class EmailControllerTest {
                                         """;
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJsonMissingField))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -107,7 +107,7 @@ class EmailControllerTest {
                                              """;
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJsonIncorrectDataType))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -124,7 +124,7 @@ class EmailControllerTest {
                                      """; // Notice the missing closing brace
 
         // Act & Assert
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(malformedEmailJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -140,7 +140,7 @@ class EmailControllerTest {
                            }
                            """;
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -156,7 +156,7 @@ class EmailControllerTest {
                            }
                            """;
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -172,7 +172,7 @@ class EmailControllerTest {
                            }
                            """;
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/sendEmail")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/sendEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(emailJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
