@@ -40,14 +40,19 @@ if /I "!doBuild!"=="y" (
             call .\gradlew build
             echo - %%d construit avec succès.
 
-
+            echo Entrez la version du tag pour %%d, par exemple, 1.0.1
+            set /p versionTag="Tag version: "
             :: Build Docker image with the specified version and also tag it as latest
             echo Building Docker image for %%d with version latest
-            docker build --no-cache -t bbsebb/backend-%%d:latest .
+            docker build --no-cache -t bbsebb/backend-%%d:!versionTag! .
+            docker tag bbsebb/backend-%%d:!versionTag! bbsebb/backend-%%d:latest
+
 
             :: Push both versioned and latest tags to Docker Hub
             echo Pushing latest Docker images for %%d to Docker Hub...
+            docker push bbsebb/backend-%%d:!versionTag!
             docker push bbsebb/backend-%%d:latest
+
 
             cd ..
         )
