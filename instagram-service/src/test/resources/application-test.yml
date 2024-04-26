@@ -1,5 +1,4 @@
-firebase:
-  service-account: classpath:ashs-e1731-firebase-adminsdk-oi9es-9af2d1075c.json
+
 spring:
   application:
     name: instagram-service

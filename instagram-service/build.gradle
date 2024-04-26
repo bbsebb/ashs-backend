@@ -17,9 +17,11 @@ repositories {
 
 ext {
     set('springCloudVersion', "2023.0.0")
+    springCloudGcpVersion = "5.1.2"
 }
 
 dependencies {
+    implementation 'com.google.cloud:spring-cloud-gcp-starter'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
@@ -28,9 +30,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
-    implementation 'com.google.firebase:firebase-admin:9.2.0'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-    testImplementation 'org.springframework.cloud:spring-cloud-contract-stub-runner-boot:4.1.1'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter-data-firestore'
+
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-stub-runner-boot'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -38,8 +41,10 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:$springCloudGcpVersion"
     }
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

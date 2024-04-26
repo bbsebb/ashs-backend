@@ -30,12 +30,6 @@ public class ApiInstagramController {
 
 
 
-    @GetMapping("/access-token/long-lived")
-    public ResponseEntity<AccessToken> getLongLivedAccessToken() {
-
-        return ResponseEntity.status(HttpStatus.OK).body(this.authInstagramService.getAccessToken());
-    }
-
     @GetMapping("/access-token/refresh")
     public ResponseEntity<Void> LongLivedAccessTokenDTO() {
         this.authInstagramService.refreshAccessToken();

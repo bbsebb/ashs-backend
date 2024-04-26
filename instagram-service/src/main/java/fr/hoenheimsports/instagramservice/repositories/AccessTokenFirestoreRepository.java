@@ -1,27 +1,16 @@
 package fr.hoenheimsports.instagramservice.repositories;
 
-import com.google.cloud.Timestamp;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import fr.hoenheimsports.instagramservice.models.AccessToken;
-import org.springframework.context.annotation.Primary;
+
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-
 @Repository
-@Primary
-public class AccessTokenFirestoreRepository implements AccessTokenRepository{
+public class AccessTokenFirestoreRepository<A> {
 
-    private final Firestore db ;
+
+    /*private final Firestore db ;
 
     public AccessTokenFirestoreRepository(Firestore db) {
-        this.db = db;
+
     }
 
     @Override
@@ -61,5 +50,5 @@ public class AccessTokenFirestoreRepository implements AccessTokenRepository{
 
     public static LocalDateTime fromTimestamp(Timestamp timestamp) {
         return LocalDateTime.ofInstant(timestamp.toDate().toInstant(), ZoneId.systemDefault());
-    }
+    }*/
 }
