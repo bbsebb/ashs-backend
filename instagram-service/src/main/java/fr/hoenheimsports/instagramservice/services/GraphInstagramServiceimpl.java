@@ -5,7 +5,6 @@ import fr.hoenheimsports.instagramservice.feignClient.dto.MediaDTO;
 import fr.hoenheimsports.instagramservice.feignClient.dto.UserMediasDTO;
 import fr.hoenheimsports.instagramservice.models.Media;
 import fr.hoenheimsports.instagramservice.models.MediaType;
-import fr.hoenheimsports.instagramservice.repositories.AccessTokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,31 +13,29 @@ public class GraphInstagramServiceimpl implements GraphInstagramService{
 
 
     private final GraphInstagram graphInstagram;
-    private final AccessTokenRepository accessTokenRepository;
+    private final AuthInstagramService authInstagramService;
 
-    public GraphInstagramServiceimpl(GraphInstagram graphInstagram, AccessTokenRepository accessTokenRepository) {
+    public GraphInstagramServiceimpl(GraphInstagram graphInstagram, AuthInstagramService authInstagramService) {
         this.graphInstagram = graphInstagram;
-        this.accessTokenRepository = accessTokenRepository;
+        this.authInstagramService = authInstagramService;
     }
 
     @Override
     public List<Media> getMedias() {
-        UserMediasDTO userMediasDTO = this.graphInstagram.getAllMediaByUser(this.getId(), "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,username", this.getToken());
+        UserMediasDTO userMediasDTO = this.graphInstagram.getAllMediaByUser(this.getId(), "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,username", this.authInstagramService.getAccessToken().getAccessToken());
         return userMediasDTO.data().stream().map(this::mapMediaDTOToMedia).toList();
     }
 
     private String getId() {
-        return this.graphInstagram.getMe("id,username,account_type,media_count", this.getToken()).id();
+        return this.graphInstagram.getMe("id,username,account_type,media_count", this.authInstagramService.getAccessToken().getAccessToken()).id();
     }
 
-    private String getToken() {
-        return this.accessTokenRepository.get().getAccessToken();
-    }
+
 
     private Media mapMediaDTOToMedia(MediaDTO mediaDTO) {
         List<Media> children = null;
         if (mediaDTO.mediaType() == fr.hoenheimsports.instagramservice.feignClient.dto.MediaType.CAROUSEL_ALBUM) {
-            List<MediaDTO> childrenDTO = this.graphInstagram.getChildrenMediaByMediaId(mediaDTO.id(), "id,media_type,media_url,permalink,thumbnail_url,timestamp,username", this.getToken()).data();
+            List<MediaDTO> childrenDTO = this.graphInstagram.getChildrenMediaByMediaId(mediaDTO.id(), "id,media_type,media_url,permalink,thumbnail_url,timestamp,username", this.authInstagramService.getAccessToken().getAccessToken()).data();
             children = childrenDTO.stream().map(this::mapMediaDTOToMedia).toList();
         }
         return  Media.builder(mediaDTO.id())

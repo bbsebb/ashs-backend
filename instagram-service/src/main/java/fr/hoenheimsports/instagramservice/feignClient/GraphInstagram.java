@@ -21,8 +21,6 @@ public interface GraphInstagram {
     @GetMapping("/{mediaId}/children")
     UserMediasDTO getChildrenMediaByMediaId(@PathVariable String mediaId, @RequestParam("fields") String fields, @RequestParam("access_token") String accessToken);
 
-    //@GetMapping("/{mediaId}")
-    //MediaDTO getMediaById(@PathVariable String mediaId, @RequestParam("fields") String fields, @RequestParam("access_token") String accessToken);
     @GetMapping("/access_token")
     LongLivedAccessTokenDTO getLongLivedAccessToken(
             @RequestParam("grant_type") String grantType,

@@ -1,7 +1,6 @@
 package fr.hoenheimsports.instagramservice.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Logger;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
