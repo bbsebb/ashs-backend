@@ -1,8 +1,7 @@
 package fr.hoenheimsports.instagramservice.models;
 
-import com.google.cloud.firestore.annotation.DocumentId;
-import com.google.cloud.spring.data.firestore.Document;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -10,7 +9,7 @@ import java.util.Objects;
 /**
  * Represents an access token.
  */
-@Document(collectionName = "accessTokens")
+@Entity
 public class AccessToken {
     @Id
     private String id = "singletonToken";
@@ -24,15 +23,6 @@ public class AccessToken {
      */
     public AccessToken() {}
 
-    /**
-     * All-args constructor.
-     */
-    public AccessToken(String accessToken, LocalDateTime createdAt, LocalDateTime expiresAt, String tokenType) {
-        this.accessToken = accessToken;
-        this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
-        this.tokenType = tokenType;
-    }
 
     private AccessToken(Builder builder) {
         this.accessToken = builder.accessToken;
@@ -44,10 +34,7 @@ public class AccessToken {
 
 
 
-    // Getters and setters
-    public String getId() {
-        return id;
-    }
+
 
     public void setId(String id) {
         this.id = id;
@@ -57,33 +44,21 @@ public class AccessToken {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-    }
 
     public String getTokenType() {
         return tokenType;
     }
 
-    public void setTokenType(String tokenType) {
-        this.tokenType = tokenType;
-    }
 
     // hashCode and equals
     @Override

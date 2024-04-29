@@ -5,7 +5,6 @@ import fr.hoenheimsports.instagramservice.feignClient.dto.MediaDTO;
 import fr.hoenheimsports.instagramservice.feignClient.dto.UserMediasDTO;
 import fr.hoenheimsports.instagramservice.models.Media;
 import fr.hoenheimsports.instagramservice.models.MediaType;
-import fr.hoenheimsports.instagramservice.repositories.AccessTokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

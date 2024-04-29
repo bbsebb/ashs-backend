@@ -6,7 +6,6 @@ import fr.hoenheimsports.instagramservice.feignClient.ApiInstagram;
 import fr.hoenheimsports.instagramservice.feignClient.GraphInstagram;
 import fr.hoenheimsports.instagramservice.feignClient.dto.LongLivedAccessTokenDTO;
 import fr.hoenheimsports.instagramservice.models.AccessToken;
-import fr.hoenheimsports.instagramservice.repositories.AccessTokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,14 +19,13 @@ public class AuthInstagramServiceImpl implements AuthInstagramService{
     private final ApiInstagram apiInstagram;
     private final GraphInstagram graphInstagram;
     private final InstragramAPIProperties instragramAPIProperties;
+    private final AccessTokenService accessTokenService;
 
-    private final AccessTokenRepository accessTokenRepository;
-
-    public AuthInstagramServiceImpl(ApiInstagram apiInstagram, GraphInstagram graphInstagram, InstragramAPIProperties instragramAPIProperties, AccessTokenRepository accessTokenRepository) {
+    public AuthInstagramServiceImpl(ApiInstagram apiInstagram, GraphInstagram graphInstagram, InstragramAPIProperties instragramAPIProperties, AccessTokenService accessTokenService) {
         this.apiInstagram = apiInstagram;
         this.graphInstagram = graphInstagram;
         this.instragramAPIProperties = instragramAPIProperties;
-        this.accessTokenRepository = accessTokenRepository;
+        this.accessTokenService = accessTokenService;
     }
 
     @Override
@@ -37,32 +35,31 @@ public class AuthInstagramServiceImpl implements AuthInstagramService{
         LongLivedAccessTokenDTO longLivedAccessTokenDTO = this.graphInstagram.getLongLivedAccessToken( "ig_exchange_token", instragramAPIProperties.clientSecret(), shortLivedAccessToken);
         var createAt = LocalDateTime.now();
         var expireAt = createAt.plusSeconds(longLivedAccessTokenDTO.expiresIn());
-        this.accessTokenRepository.save(
+        this.accessTokenService.save(
                 AccessToken.builder()
                 .accessToken(longLivedAccessTokenDTO.accessToken())
                 .createdAt(createAt)
                 .expiresAt(expireAt)
                 .tokenType(longLivedAccessTokenDTO.tokenType())
-                .build()).block();
+                .build());
     }
 
     @Override
     public AccessToken getAccessToken() {
-        return this.accessTokenRepository.findById("singletonToken").blockOptional().orElseThrow(AccessTokenNotFound::new);
+        return this.accessTokenService.get().orElseThrow(AccessTokenNotFound::new);
     }
 
     @Override
     public void refreshAccessToken() {
         var accessToken = this.getAccessToken();
         String refreshedAccessToken = this.graphInstagram.refreshAccessToken("ig_refresh_token",accessToken.getAccessToken()).accessToken();
-        this.accessTokenRepository.save(
+        this.accessTokenService.save(
                 AccessToken.builder()
                         .accessToken(refreshedAccessToken)
                         .createdAt(accessToken.getCreatedAt())
                         .expiresAt(accessToken.getExpiresAt())
                         .tokenType(accessToken.getTokenType())
-                        .build())
-                .block();
+                        .build());
     }
 
 

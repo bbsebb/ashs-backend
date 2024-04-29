@@ -3,20 +3,7 @@ spring:
     name: instagram-service
   config:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
-  cloud:
-    gcp:
-      firestore:
-        project-id: 'ashs-e1731'
-        host-port: 'localhost:8079'
-        credentials:
-          location: 'classpath:ashs-e1731-firebase-adminsdk-oi9es-9af2d1075c.json'
 server:
   port: 8083
-logging:
-  level:
-    org:
-      springframework:
-        cloud:
-          openfeign: DEBUG
-    feign:
-      client: DEBUG
+
+
