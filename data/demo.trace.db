@@ -1,0 +1,8 @@
+2024-04-28 17:33:08.915208+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ACCESS_TOKEN" non trouvée
+Table "ACCESS_TOKEN" not found; SQL statement:
+select at1_0.id,at1_0.access_token,at1_0.created_at,at1_0.expires_at,at1_0.token_type from access_token at1_0 where at1_0.id=? [42102-224]
+2024-04-28 17:33:35.481345+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ACCESS_TOKEN" non trouvée
+Table "ACCESS_TOKEN" not found; SQL statement:
+select at1_0.id,at1_0.access_token,at1_0.created_at,at1_0.expires_at,at1_0.token_type from access_token at1_0 where at1_0.id=? [42102-224]

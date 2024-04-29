@@ -1,0 +1,2 @@
+INSERT INTO access_token (id, access_token, created_at, expires_at, token_type)
+VALUES ('singletonToken', 'IGQWRPeEE1dk1FY1haQThZAcGd2OFVLd3ZAlRFpFS3ZAoSFE2Ykg2bWhwRndfOFc4Yk9oYnFoOTBfZAk0yTHhUZAk93M3FKTUhrbnNRRzBYNnNLcktwTGRHcDFaeklkWjE1bHQ2Sk45dW5QLXQ1UQZDZD', '2024-03-19T23:16:59', '2024-05-18T22:45:52', 'bearer');
