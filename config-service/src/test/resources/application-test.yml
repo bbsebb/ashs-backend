@@ -2,6 +2,11 @@ spring:
   cloud:
     discovery:
       enabled: false
+    config:
+      server:
+        git:
+          clone-on-start: true
+          uri: file://C:/Users/bbseb/Documents/programmation/ashs/backend/config-repository
 eureka:
   client:
     enabled: false
