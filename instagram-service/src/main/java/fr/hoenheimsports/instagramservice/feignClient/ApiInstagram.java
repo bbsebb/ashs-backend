@@ -15,5 +15,4 @@ public interface ApiInstagram {
     @PostMapping(value ="/oauth/access_token",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     ShortLivedAccessTokenDTO getShortLivedAccessToken(@RequestBody Map<String, ?> formData);
 
-
 }

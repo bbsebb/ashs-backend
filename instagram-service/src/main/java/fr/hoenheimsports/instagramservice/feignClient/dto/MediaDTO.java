@@ -7,7 +7,6 @@ import java.net.URL;
 import java.time.OffsetDateTime;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-
 public record MediaDTO(
         String caption,
         String id,
