@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: training-service
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: false
+
+
+server:
+  port: 8084
+
+eureka:
+  client:
+    enabled: false
