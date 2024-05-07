@@ -29,36 +29,33 @@ public class AuthInstagramServiceImpl implements AuthInstagramService{
     }
 
     @Override
-    public void auth(String code) {
-
-        String shortLivedAccessToken = this.getShortLivedAccessToken(code);
-        LongLivedAccessTokenDTO longLivedAccessTokenDTO = this.graphInstagram.getLongLivedAccessToken( "ig_exchange_token", instragramAPIProperties.clientSecret(), shortLivedAccessToken);
-        var createAt = LocalDateTime.now();
-        var expireAt = createAt.plusSeconds(longLivedAccessTokenDTO.expiresIn());
-        this.accessTokenService.save(
-                AccessToken.builder()
-                .accessToken(longLivedAccessTokenDTO.accessToken())
-                .createdAt(createAt)
-                .expiresAt(expireAt)
-                .tokenType(longLivedAccessTokenDTO.tokenType())
-                .build());
+    public void getAccessToken(String code) {
+        String accessToken = this.getShortLivedAccessToken(code);
+        LongLivedAccessTokenDTO longLivedAccessTokenDTO = this.graphInstagram.getLongLivedAccessToken( "ig_exchange_token", instragramAPIProperties.clientSecret(), accessToken);
+        this.saveAccessToken(longLivedAccessTokenDTO);
     }
 
     @Override
-    public AccessToken getAccessToken() {
+    public AccessToken retrieveAccessToken() {
         return this.accessTokenService.get().orElseThrow(AccessTokenNotFound::new);
     }
 
     @Override
     public void refreshAccessToken() {
-        var accessToken = this.getAccessToken();
-        String refreshedAccessToken = this.graphInstagram.refreshAccessToken("ig_refresh_token",accessToken.getAccessToken()).accessToken();
+        String accessToken = this.retrieveAccessToken().getAccessToken();
+        LongLivedAccessTokenDTO refreshedAccessToken = this.graphInstagram.refreshAccessToken("ig_refresh_token",accessToken);
+        this.saveAccessToken(refreshedAccessToken);
+    }
+
+    private void saveAccessToken(LongLivedAccessTokenDTO refreshedAccessToken){
+        var createAt = LocalDateTime.now();
+        var expireAt = createAt.plusSeconds(refreshedAccessToken.expiresIn());
         this.accessTokenService.save(
                 AccessToken.builder()
-                        .accessToken(refreshedAccessToken)
-                        .createdAt(accessToken.getCreatedAt())
-                        .expiresAt(accessToken.getExpiresAt())
-                        .tokenType(accessToken.getTokenType())
+                        .accessToken(refreshedAccessToken.accessToken())
+                        .createdAt(createAt)
+                        .expiresAt(expireAt)
+                        .tokenType(refreshedAccessToken.tokenType())
                         .build());
     }
 
