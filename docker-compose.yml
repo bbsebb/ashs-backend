@@ -114,6 +114,31 @@ services:
         condition: service_healthy
       postgres-instagram:
         condition: service_healthy
+  # Services training
+  training-service:
+    image: bbsebb/backend-training-service:latest
+    container_name: instagram-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.instagram-service
+    expose:
+      - "8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+      postgres-instagram:
+        condition: service_healthy
   # Postgres db for instagram service
   postgres-instagram:
     image: postgres:16.2
@@ -124,7 +149,23 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - instagram-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U utilisateur" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # Postgres db for instagram service
+  postgres-training:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: training_db
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - training-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U utilisateur" ]
       interval: 10s
@@ -133,3 +174,4 @@ services:
 
 volumes:
   postgres_data:
+  training_data:
