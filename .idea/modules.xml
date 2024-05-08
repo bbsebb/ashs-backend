@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/instagram-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/instagram-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/instagram-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/instagram-service.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/training-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/training-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/training-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/training-service.test.iml" />
     </modules>
   </component>
 </project>
