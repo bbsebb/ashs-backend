@@ -83,13 +83,13 @@ echo Souhaitez-vous nettoyer les ressources Docker utilisées ? (y/n)
 set /p doClean="Réponse: "
 if /I "!doClean!"=="y" (
     echo [4/4] Nettoyage des ressources Docker...
+    docker-compose down
+    ::docker-compose down --rmi all --volumes
+    ::docker image prune -f
     cd logs
     echo  Fermeture de Fluent Bit...
     docker-compose down
     cd ..
-    docker-compose down
-    ::docker-compose down --rmi all --volumes
-    ::docker image prune -f
     echo - Ressources Docker nettoyées.
 ) else (
     echo - Nettoyage ignoré.
