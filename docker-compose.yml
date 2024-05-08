@@ -139,7 +139,7 @@ services:
     image: postgres:16.2
     environment:
       POSTGRES_DB: instagram_db
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USER: sa
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     expose:
       - "5432"
@@ -155,7 +155,7 @@ services:
     image: postgres:16.2
     environment:
       POSTGRES_DB: training_db
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USER: sa
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     expose:
       - "5432"
