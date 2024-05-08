@@ -22,7 +22,7 @@ public class ApiInstagramController {
     @GetMapping("")
     public ResponseEntity<Void> auth(@RequestParam String code) {
 
-        this.authInstagramService.auth(code);
+        this.authInstagramService.getAccessToken(code);
         return ResponseEntity.noContent().build();
     }
 

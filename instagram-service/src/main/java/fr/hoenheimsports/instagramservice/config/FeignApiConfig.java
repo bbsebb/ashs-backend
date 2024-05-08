@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignApiConfig {
 
-
     private final ObjectMapper objectMapper;
 
     public FeignApiConfig(ObjectMapper objectMapper) {
