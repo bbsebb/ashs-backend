@@ -7,13 +7,12 @@ import java.util.Objects;
 @Entity
 public class TrainingSession {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Embedded
     private TimeSlot timeSlot;
     @ManyToOne
-    @JoinColumn(name = "halle_id")
-    private Halle halle;
+    private Hall hall;
 
 
     public TrainingSession() {
@@ -23,7 +22,7 @@ public class TrainingSession {
     private TrainingSession(Builder builder) {
         setId(builder.id);
         setTimeSlot(builder.timeSlot);
-        setHalle(builder.halle);
+        setHall(builder.hall);
     }
 
     public Long getId() {
@@ -42,12 +41,12 @@ public class TrainingSession {
         this.timeSlot = timeSlot;
     }
 
-    public Halle getHalle() {
-        return halle;
+    public Hall getHall() {
+        return hall;
     }
 
-    public void setHalle(Halle halle) {
-        this.halle = halle;
+    public void setHall(Hall hall) {
+        this.hall = hall;
     }
 
     @Override
@@ -55,12 +54,12 @@ public class TrainingSession {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrainingSession that = (TrainingSession) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getTimeSlot(), that.getTimeSlot()) && Objects.equals(getHalle(), that.getHalle());
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getTimeSlot(), that.getTimeSlot()) && Objects.equals(getHall(), that.getHall());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getTimeSlot(), getHalle());
+        return Objects.hash(getId(), getTimeSlot(), getHall());
     }
 
     @Override
@@ -68,7 +67,7 @@ public class TrainingSession {
         return "TrainingSession{" +
                 "id=" + id +
                 ", timeSlot=" + timeSlot +
-                ", halle=" + halle +
+                ", hall=" + hall +
                 '}';
     }
 
@@ -82,7 +81,7 @@ public class TrainingSession {
     public static final class Builder {
         private Long id;
         private TimeSlot timeSlot;
-        private Halle halle;
+        private Hall hall;
 
         private Builder() {
         }
@@ -114,13 +113,13 @@ public class TrainingSession {
         }
 
         /**
-         * Sets the {@code halle} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code hall} and returns a reference to this Builder enabling method chaining.
          *
-         * @param halle the {@code halle} to set
+         * @param hall the {@code hall} to set
          * @return a reference to this Builder
          */
-        public Builder halle(Halle halle) {
-            this.halle = halle;
+        public Builder hall(Hall hall) {
+            this.hall = hall;
             return this;
         }
 

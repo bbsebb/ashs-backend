@@ -5,3 +5,5 @@ spring:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
 server:
   port: 8084
+springdoc:
+  default-produces-media-type: application/prs.hal-forms+json
