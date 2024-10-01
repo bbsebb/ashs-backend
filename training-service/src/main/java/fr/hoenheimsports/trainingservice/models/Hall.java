@@ -3,21 +3,21 @@ package fr.hoenheimsports.trainingservice.models;
 import jakarta.persistence.*;
 
 @Entity
-public class Halle {
+public class Hall {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     @Embedded
     private Address address;
 
-    private Halle(Builder builder) {
+    private Hall(Builder builder) {
         setId(builder.id);
         setName(builder.name);
         setAddress(builder.address);
     }
 
-    public Halle() {
+    public Hall() {
     }
 
     public Long getId() {
@@ -101,8 +101,8 @@ public class Halle {
          *
          * @return a {@code Halle} built with parameters of this {@code Halle.Builder}
          */
-        public Halle build() {
-            return new Halle(this);
+        public Hall build() {
+            return new Hall(this);
         }
     }
 }

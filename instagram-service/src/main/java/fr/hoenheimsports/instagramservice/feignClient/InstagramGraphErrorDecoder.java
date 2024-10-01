@@ -29,6 +29,7 @@ public class InstagramGraphErrorDecoder implements ErrorDecoder{
                     case "IGApiException" -> new IGAPIException(errorResponse.error().message());
                     case "IGApiUnauthorizedException" -> new IGAPIUnauthorizedException(errorResponse.error().message());
                     case "CodedException" -> new CodedException(errorResponse.error().message());
+                    case "OAuthException" -> new IGAPIOAuthException(errorResponse.error().message());
                     case "IGApiForbiddenException" -> new IGAPIForbiddenException(errorResponse.error().message());
                     default -> new InstagramAPIException("Unknown error calling Instagram API.");
 

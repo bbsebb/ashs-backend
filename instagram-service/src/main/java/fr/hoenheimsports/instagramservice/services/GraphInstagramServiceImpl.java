@@ -22,6 +22,7 @@ public class GraphInstagramServiceImpl implements GraphInstagramService{
 
     @Override
     public List<Media> getMedias() {
+        this.authInstagramService.refreshAccessToken(); // refresh token for each request to avoid expiration TODO : remove this line when we have a better solution
         UserMediasDTO userMediasDTO = this.graphInstagram.getAllMediaByUser(this.getId(), "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,username", this.authInstagramService.retrieveAccessToken().getAccessToken());
         return userMediasDTO.data().stream().map(this::mapMediaDTOToMedia).toList();
     }

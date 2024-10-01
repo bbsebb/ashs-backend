@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.3'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
@@ -16,13 +16,15 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', "2023.0.0")
+    set('springCloudVersion', "2023.0.3")
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    // Forcer l'utilisation de la version 1.5.4 de Jettison
+    implementation 'org.codehaus.jettison:jettison:1.5.4'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
