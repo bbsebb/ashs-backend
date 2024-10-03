@@ -1,2 +1,0 @@
-INSERT INTO access_token (id, access_token, created_at, expires_at, token_type)
-VALUES ('singletonToken', 'IGQWRPaHVaOThTR0FYeGtDdU9aRGdSejRpRnhlaWVNRmFtb0Y4cC1YbkNmX0d5VXM5UXZAKZA1pUSG1rS0tUV1lmdDlWWVVEcHpTdEhiMFQ4SUo4MVF4Ym1xa1pHekNqUnhaaTZAFTWtDbmFpUQZDZD', '2024-03-19T23:16:59', '2024-08-18T22:45:52', 'bearer');
