@@ -8,7 +8,7 @@ import java.util.Set;
 @Entity
 public class Team {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
@@ -18,7 +18,12 @@ public class Team {
     @ManyToOne
     private Coach coach;
     @OneToMany(cascade = {CascadeType.REMOVE})
-    private Set<TrainingSession> trainingSession;
+    @JoinTable(
+            name = "team_training_session",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "training_session_id")
+    )
+    private Set<TrainingSession> trainingSessions;
 
     private Team(Builder builder) {
         setId(builder.id);
@@ -26,7 +31,7 @@ public class Team {
         setCategory(builder.category);
         setTeamNumber(builder.teamNumber);
         setCoach(builder.coach);
-        setTrainingSession(builder.trainingSession);
+        setTrainingSessions(builder.trainingSession);
     }
 
     public Team() {
@@ -73,12 +78,12 @@ public class Team {
         this.coach = coach;
     }
 
-    public Set<TrainingSession> getTrainingSession() {
-        return trainingSession;
+    public Set<TrainingSession> getTrainingSessions() {
+        return trainingSessions;
     }
 
-    public void setTrainingSession(Set<TrainingSession> trainingSession) {
-        this.trainingSession = trainingSession;
+    public void setTrainingSessions(Set<TrainingSession> trainingSessions) {
+        this.trainingSessions = trainingSessions;
     }
 
     @Override
@@ -86,12 +91,12 @@ public class Team {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Team team = (Team) o;
-        return getTeamNumber() == team.getTeamNumber() && Objects.equals(getId(), team.getId()) && getGender() == team.getGender() && getCategory() == team.getCategory() && Objects.equals(getCoach(), team.getCoach()) && Objects.equals(getTrainingSession(), team.getTrainingSession());
+        return getTeamNumber() == team.getTeamNumber() && Objects.equals(getId(), team.getId()) && getGender() == team.getGender() && getCategory() == team.getCategory() && Objects.equals(getCoach(), team.getCoach()) && Objects.equals(getTrainingSessions(), team.getTrainingSessions());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getGender(), getCategory(), getTeamNumber(), getCoach(), getTrainingSession());
+        return Objects.hash(getId(), getGender(), getCategory(), getTeamNumber(), getCoach(), getTrainingSessions());
     }
 
     @Override
@@ -102,7 +107,7 @@ public class Team {
                 ", category=" + category +
                 ", teamNumber=" + teamNumber +
                 ", coach=" + coach +
-                ", trainingSession=" + trainingSession +
+                ", trainingSession=" + trainingSessions +
                 '}';
     }
 
@@ -190,7 +195,7 @@ public class Team {
          * @param trainingSession the {@code trainingSession} to set
          * @return a reference to this Builder
          */
-        public Builder trainingSession(Set<TrainingSession> trainingSession) {
+        public Builder trainingSessions(Set<TrainingSession> trainingSession) {
             this.trainingSession = trainingSession;
             return this;
         }

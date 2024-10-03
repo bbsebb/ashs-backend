@@ -4,13 +4,28 @@ spring:
   cloud:
     config:
       enabled: false
+    discovery:
+      enabled: false
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
   flyway:
-    enabled: false
+    clean-disabled: false
+    clean-on-validation-error: true
+  datasource:
+    url: jdbc:tc:postgresql:latest:///test_database
+    username: user
+    password: password
 
 
-server:
-  port: 8084
 
-eureka:
-  client:
-    enabled: false
+
+
+
+
+
+
