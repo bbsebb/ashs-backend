@@ -9,4 +9,4 @@ spring:
           uri: https://github.com/bbsebb/ashs-config-repository.git
           username: '{cipher}AQCzzdkEuAVwCjja1o3kKvNfRZqTUJF/QmaNT/dNZHpfw3DnIc5+nCPtnFW7bYMh3YtAEPhBQusaIkvxsMhwZS4mtRjSB9slr/l+OTQVmt2+cfpgy/qeSKVurylRakjMqYjGaW5fcWurZYwey9LTQWQ1sDaQSg7Ii9LC1LTsDVS944eLBX3piMZgqqVTHYQVJ2Kb7FIpBgYmT/uDvMalBuuoq3v0URCM0HI91T+D60W9YD8qvlZjq3N6ORmbtmHeS5tPzcw9hZiGUD2VowKivAF9H4QKGDaMA2kNhUTIy6lSG635GiAEMweh4J2XcjbRWtLwuzbha+vUUrOkGfM35ojkioI9CFYw16ltiWXWCz0IT77BTWHMjSLqFGLLm5fFFTU='
           password: '{cipher}AQB5vaOotuBpd5zPk4b3U2RXo2ZvgVuV7fDrQl4zhX7XLenSKYBR7F+StkquiaNFxa96YC5BNJRSx2KstWtrLwQO+uT0GlbWYntoa6qQ1bCuG9+D40Nl8oh1TkN/gRmcHl6wCzNsXErzJymWn4UctW4E/Ln1xeoSV7UX1C4PivAuO9nT1H9GVUCDOiOo2z39bP2Pga5WULbudHJfkoNsVSmXKiE0JT6hThw9AwJBJJZsxLU09jKzoFQF0i1MBe1kP9BPvCFWWJQDpWaYwneprZRF6eXbBXr/3J3pEE1sq4Is9GzEnPzYmrFF61583oLSI8vh8ws3gkkeJ3Inw3rVCPTTBzw3mJQb5cDWeMyIfOq3VKeOZblmG4k62y1VtTFqXer6N4Q5x4e46RrOHQRS3g3cozpYeVb4H4stAeS6nbXsbQ=='
-          default-label: prod
+          default-label: production
