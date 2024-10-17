@@ -3,7 +3,7 @@ package fr.hoenheimsports.trainingservice.assemblers;
 import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.CoachControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -11,8 +11,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Component
 public class CoachModelAssemblerImpl implements CoachModelAssembler{
 
-    public CoachModel toModel( CoachDto coachDto)  {
-        CoachModel coachModel = new CoachModel(coachDto);
+    public EntityModel<CoachDto> toModel(CoachDto coachDto)  {
+        EntityModel<CoachDto> coachModel = EntityModel.of(coachDto);
         try {
             coachModel.add(
                     linkTo(methodOn(CoachControllerImpl.class).getCoachById(coachDto.id())).withSelfRel()

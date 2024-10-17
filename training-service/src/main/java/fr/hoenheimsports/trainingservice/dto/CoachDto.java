@@ -9,5 +9,5 @@ import java.io.Serializable;
  * DTO for {@link fr.hoenheimsports.trainingservice.models.Coach}
  */
 @Relation(collectionRelation = "coaches")
-public record CoachDto(@JsonIgnore Long id, String name, String surname, String email, String phone) implements Serializable {
+public record CoachDto(Long id, String name, String surname, String email, String phone) implements Serializable {
 }

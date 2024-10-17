@@ -1,8 +1,11 @@
 package fr.hoenheimsports.trainingservice.assemblers;
 
 import fr.hoenheimsports.trainingservice.controllers.TrainingSessionControllerImpl;
-import fr.hoenheimsports.trainingservice.dto.*;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
+import fr.hoenheimsports.trainingservice.dto.AddressDto;
+import fr.hoenheimsports.trainingservice.dto.HallDto;
+import fr.hoenheimsports.trainingservice.dto.TimeSlotDto;
+import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
+
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.time.DayOfWeek;
@@ -46,16 +50,16 @@ public class TrainingSessionPagedModelAssemblerImplTest {
         TrainingSessionDto trainingSessionDto1 = new TrainingSessionDto(1L, timeSlotDto, hallDto);
         TrainingSessionDto trainingSessionDto2 = new TrainingSessionDto(2L, timeSlotDto, hallDto);
 
-        TrainingSessionModel trainingSessionModel1 = new TrainingSessionModel(trainingSessionDto1);
-        TrainingSessionModel trainingSessionModel2 = new TrainingSessionModel(trainingSessionDto2);
+        EntityModel<TrainingSessionDto> trainingSessionModel1 = EntityModel.of(trainingSessionDto1);
+        EntityModel<TrainingSessionDto> trainingSessionModel2 = EntityModel.of(trainingSessionDto2);
 
-        List<TrainingSessionModel> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
-        Page<TrainingSessionModel> page = new PageImpl<>(trainingSessionModels, PageRequest.of(0, 2, Sort.by("name")), 4);
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
+        Page<EntityModel<TrainingSessionDto>> page = new PageImpl<>(trainingSessionModels, PageRequest.of(0, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TrainingSessionModel> pagedModel = trainingSessionPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TrainingSessionDto>> pagedModel = (PagedModel<EntityModel<TrainingSessionDto>>) trainingSessionPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -97,16 +101,16 @@ public class TrainingSessionPagedModelAssemblerImplTest {
         TrainingSessionDto trainingSessionDto1 = new TrainingSessionDto(3L, timeSlotDto, hallDto);
         TrainingSessionDto trainingSessionDto2 = new TrainingSessionDto(4L, timeSlotDto, hallDto);
 
-        TrainingSessionModel trainingSessionModel1 = new TrainingSessionModel(trainingSessionDto1);
-        TrainingSessionModel trainingSessionModel2 = new TrainingSessionModel(trainingSessionDto2);
+        EntityModel<TrainingSessionDto> trainingSessionModel1 = EntityModel.of(trainingSessionDto1);
+        EntityModel<TrainingSessionDto> trainingSessionModel2 = EntityModel.of(trainingSessionDto2);
 
-        List<TrainingSessionModel> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
-        Page<TrainingSessionModel> page = new PageImpl<>(trainingSessionModels, PageRequest.of(1, 2, Sort.by("name")), 4);
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
+        Page<EntityModel<TrainingSessionDto>> page = new PageImpl<>(trainingSessionModels, PageRequest.of(1, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TrainingSessionModel> pagedModel = trainingSessionPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TrainingSessionDto>> pagedModel = (PagedModel<EntityModel<TrainingSessionDto>>) trainingSessionPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -148,16 +152,16 @@ public class TrainingSessionPagedModelAssemblerImplTest {
         TrainingSessionDto trainingSessionDto1 = new TrainingSessionDto(1L, timeSlotDto, hallDto);
         TrainingSessionDto trainingSessionDto2 = new TrainingSessionDto(2L, timeSlotDto, hallDto);
 
-        TrainingSessionModel trainingSessionModel1 = new TrainingSessionModel(trainingSessionDto1);
-        TrainingSessionModel trainingSessionModel2 = new TrainingSessionModel(trainingSessionDto2);
+        EntityModel<TrainingSessionDto> trainingSessionModel1 = EntityModel.of(trainingSessionDto1);
+        EntityModel<TrainingSessionDto> trainingSessionModel2 = EntityModel.of(trainingSessionDto2);
 
-        List<TrainingSessionModel> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
-        Page<TrainingSessionModel> page = new PageImpl<>(trainingSessionModels, PageRequest.of(0, 2, Sort.by("name")), 2);
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
+        Page<EntityModel<TrainingSessionDto>> page = new PageImpl<>(trainingSessionModels, PageRequest.of(0, 2, Sort.by("name")), 2);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TrainingSessionModel> pagedModel = trainingSessionPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TrainingSessionDto>> pagedModel = (PagedModel<EntityModel<TrainingSessionDto>>) trainingSessionPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -196,16 +200,16 @@ public class TrainingSessionPagedModelAssemblerImplTest {
         TrainingSessionDto trainingSessionDto1 = new TrainingSessionDto(1L, timeSlotDto, hallDto);
         TrainingSessionDto trainingSessionDto2 = new TrainingSessionDto(2L, timeSlotDto, hallDto);
 
-        TrainingSessionModel trainingSessionModel1 = new TrainingSessionModel(trainingSessionDto1);
-        TrainingSessionModel trainingSessionModel2 = new TrainingSessionModel(trainingSessionDto2);
+        EntityModel<TrainingSessionDto> trainingSessionModel1 = EntityModel.of(trainingSessionDto1);
+        EntityModel<TrainingSessionDto> trainingSessionModel2 = EntityModel.of(trainingSessionDto2);
 
-        List<TrainingSessionModel> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
-        Page<TrainingSessionModel> page = new PageImpl<>(trainingSessionModels, PageRequest.of(1, 2, Sort.by("name")), 6);
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = List.of(trainingSessionModel1, trainingSessionModel2);
+        Page<EntityModel<TrainingSessionDto>> page = new PageImpl<>(trainingSessionModels, PageRequest.of(1, 2, Sort.by("name")), 6);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TrainingSessionModel> pagedModel = trainingSessionPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TrainingSessionDto>> pagedModel = (PagedModel<EntityModel<TrainingSessionDto>>) trainingSessionPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();

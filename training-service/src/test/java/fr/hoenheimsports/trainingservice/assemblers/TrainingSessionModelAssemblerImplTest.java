@@ -8,9 +8,9 @@ import fr.hoenheimsports.trainingservice.dto.AddressDto;
 import fr.hoenheimsports.trainingservice.dto.HallDto;
 import fr.hoenheimsports.trainingservice.dto.TimeSlotDto;
 import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
 import java.time.DayOfWeek;
@@ -38,7 +38,7 @@ public class TrainingSessionModelAssemblerImplTest {
         TrainingSessionDto trainingSessionDto = new TrainingSessionDto(1L, timeSlotDto, hallDto);
 
         // Act
-        TrainingSessionModel trainingSessionModel = trainingSessionModelAssemblerImpl.toModel(trainingSessionDto);
+        EntityModel<TrainingSessionDto> trainingSessionModel = trainingSessionModelAssemblerImpl.toModel(trainingSessionDto);
 
         // Assert
         assertThat(trainingSessionModel).isNotNull();

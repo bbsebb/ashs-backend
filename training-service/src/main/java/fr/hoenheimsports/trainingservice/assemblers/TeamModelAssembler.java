@@ -1,7 +1,7 @@
 package fr.hoenheimsports.trainingservice.assemblers;
 
 import fr.hoenheimsports.trainingservice.dto.TeamDto;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
+import org.springframework.hateoas.EntityModel;
 
-public interface TeamModelAssembler extends ModelAssembler<TeamDto, TeamModel>{
+public interface TeamModelAssembler extends ModelAssembler<TeamDto, EntityModel<TeamDto>>{
 }

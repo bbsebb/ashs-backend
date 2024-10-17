@@ -3,9 +3,9 @@ package fr.hoenheimsports.trainingservice.assemblers;
 import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.CoachControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +27,7 @@ public class CoachModelAssemblerImplTest {
         CoachDto coachDto = new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890");
 
         // Act
-        CoachModel coachModel = coachModelAssemblerImpl.toModel(coachDto);
+        EntityModel<CoachDto> coachModel = coachModelAssemblerImpl.toModel(coachDto);
 
         // Assert
         assertThat(coachModel).isNotNull();

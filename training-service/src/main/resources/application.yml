@@ -7,3 +7,8 @@ server:
   port: 8084
 springdoc:
   default-produces-media-type: application/prs.hal-forms+json
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.http.converter.json: DEBUG
+    com.fasterxml.jackson.databind: DEBUG

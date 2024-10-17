@@ -3,7 +3,7 @@ package fr.hoenheimsports.trainingservice.assemblers;
 import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.HallControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.HallDto;
-import fr.hoenheimsports.trainingservice.ressources.HallModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -11,8 +11,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Component
 public class HallModelAssemblerImpl implements HallModelAssembler {
     @Override
-    public HallModel toModel(HallDto entity) {
-        HallModel hallModel = new HallModel(entity);
+    public EntityModel<HallDto> toModel(HallDto entity) {
+        EntityModel<HallDto> hallModel = EntityModel.of(entity);
         try {
             hallModel.add(
                     linkTo(methodOn(HallControllerImpl.class).getHallById(entity.id())).withSelfRel()

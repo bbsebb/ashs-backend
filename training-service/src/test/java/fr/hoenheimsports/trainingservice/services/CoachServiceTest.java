@@ -1,13 +1,14 @@
 package fr.hoenheimsports.trainingservice.services;
 
 import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
-import fr.hoenheimsports.trainingservice.assemblers.CoachModelAssembler;
+
+import fr.hoenheimsports.trainingservice.assemblers.CoachModelAssemblerImpl;
 import fr.hoenheimsports.trainingservice.assemblers.CoachPagedModelAssembler;
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
 import fr.hoenheimsports.trainingservice.mappers.CoachMapper;
 import fr.hoenheimsports.trainingservice.models.Coach;
 import fr.hoenheimsports.trainingservice.repositories.CoachRepository;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.util.Arrays;
@@ -36,7 +38,7 @@ public class CoachServiceTest {
     private CoachRepository coachRepository;
 
     @Mock
-    private CoachModelAssembler coachModelAssemblerImpl;
+    private CoachModelAssemblerImpl coachModelAssemblerImpl;
 
     @Mock
     private CoachPagedModelAssembler coachPagedModelAssemblerImpl;
@@ -62,14 +64,14 @@ public class CoachServiceTest {
         savedCoach.setSurname("Doe");
         savedCoach.setEmail("john.doe@example.com");
         savedCoach.setPhone("1234567890");
-        CoachModel coachModel = new CoachModel(new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890"));
+        EntityModel<CoachDto> coachModel = EntityModel.of(new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890"));
 
         given(coachRepository.save(any(Coach.class))).willReturn(savedCoach);
         given(coachMapper.toDto(savedCoach)).willReturn(new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890"));
         given(coachModelAssemblerImpl.toModel(any(CoachDto.class))).willReturn(coachModel);
 
         // Act
-        CoachModel createdCoach = coachService.createCoach(coachDto);
+        EntityModel<CoachDto> createdCoach = coachService.createCoach(coachDto);
 
         // Assert
         assertThat(createdCoach).isNotNull();
@@ -103,20 +105,27 @@ public class CoachServiceTest {
                 new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890"),
                 new CoachDto(2L, "Jane", "Doe", "jane.doe@example.com", "0987654321")
         );
-        List<CoachModel> coachModels = Arrays.asList(
-                new CoachModel(coachDtos.get(0)),
-                new CoachModel(coachDtos.get(1))
+        List<EntityModel<CoachDto>> coachModels = Arrays.asList(
+                EntityModel.of(coachDtos.get(0)),
+                EntityModel.of(coachDtos.get(1))
         );
-        PagedModel<CoachModel> pagedModel = PagedModel.of(coachModels, new PagedModel.PageMetadata(10, 0, coachModels.size()));
+        PagedModel<?> pagedModel =  PagedModel.of(coachModels, new PagedModel.PageMetadata(10, 0, coachModels.size()));
 
         given(sortUtil.createSort(sortParams)).willReturn(pageable.getSort());
         given(coachRepository.findAll(any(Pageable.class))).willReturn(coachPage);
         given(coachMapper.toDto(any(Coach.class))).willReturn(coachDtos.get(0), coachDtos.get(1));
-        given(coachPagedModelAssemblerImpl.toModel(ArgumentMatchers.any())).willReturn(pagedModel);
+        given(coachPagedModelAssemblerImpl.toModel(ArgumentMatchers.any())).willAnswer(invocation -> {
+            // Accès à l'argument Page<EntityModel<CoachDto>> si nécessaire
+            Page<EntityModel<CoachDto>> page = invocation.getArgument(0);
+
+            // Vous pouvez effectuer des opérations sur cet argument si nécessaire
+            // et ensuite retourner l'objet simulé
+            return pagedModel; // Retourne pagedModel
+        });
 
 
         // Act
-        PagedModel<CoachModel> result = coachService.getAllCoaches(0, 10, sortParams);
+        PagedModel<EntityModel<CoachDto>> result = (PagedModel<EntityModel<CoachDto>>) coachService.getAllCoaches(0, 10, sortParams);
 
         // Assert
         assertThat(result).isNotNull();
@@ -148,14 +157,14 @@ public class CoachServiceTest {
                 .phone("1234567890")
                 .build();
         CoachDto coachDto = new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890");
-        CoachModel coachModel = new CoachModel(coachDto);
+        EntityModel<CoachDto> coachModel = EntityModel.of(coachDto);
 
         given(coachRepository.findById(1L)).willReturn(Optional.of(coach));
         given(coachMapper.toDto(coach)).willReturn(coachDto);
         given(coachModelAssemblerImpl.toModel(coachDto)).willReturn(coachModel);
 
         // Act
-        CoachModel result = coachService.getCoachById(1L);
+        EntityModel<CoachDto> result = coachService.getCoachById(1L);
 
         // Assert
         assertThat(result).isNotNull();
@@ -196,15 +205,15 @@ public class CoachServiceTest {
                 .phone("1234567890")
                 .build();
         CoachDto updatedCoachDto = new CoachDto(1L, "John", "Doe", "john.doe@example.com", "1234567890");
-        CoachModel updatedCoachModel = new CoachModel(updatedCoachDto);
+        EntityModel<CoachDto> updatedEntityModel = EntityModel.of(updatedCoachDto);
 
         given(coachRepository.findById(1L)).willReturn(Optional.of(coach));
         given(coachRepository.save(any(Coach.class))).willReturn(updatedCoach);
         given(coachMapper.toDto(updatedCoach)).willReturn(updatedCoachDto);
-        given(coachModelAssemblerImpl.toModel(updatedCoachDto)).willReturn(updatedCoachModel);
+        given(coachModelAssemblerImpl.toModel(updatedCoachDto)).willReturn(updatedEntityModel);
 
         // Act
-        CoachModel result = coachService.updateCoach(1L, coachDto);
+        EntityModel<CoachDto> result = coachService.updateCoach(1L, coachDto);
 
         // Assert
         assertThat(result).isNotNull();

@@ -6,7 +6,6 @@ import fr.hoenheimsports.trainingservice.dto.TeamDto;
 import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
 import fr.hoenheimsports.trainingservice.models.Category;
 import fr.hoenheimsports.trainingservice.models.Gender;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
@@ -48,16 +48,16 @@ public class TeamPagedModelAssemblerImplTest {
         TeamDto teamDto1 = new TeamDto(1L, Gender.M, Category.SENIOR, 1, coachDto, Set.of(trainingSessionDto));
         TeamDto teamDto2 = new TeamDto(2L, Gender.F, Category.U11, 2, coachDto, Set.of(trainingSessionDto));
 
-        TeamModel teamModel1 = new TeamModel(teamDto1);
-        TeamModel teamModel2 = new TeamModel(teamDto2);
+        EntityModel<TeamDto> teamModel1 = EntityModel.of(teamDto1);
+        EntityModel<TeamDto> teamModel2 = EntityModel.of(teamDto2);
 
-        List<TeamModel> teamModels = List.of(teamModel1, teamModel2);
-        Page<TeamModel> page = new PageImpl<>(teamModels, PageRequest.of(0, 2, Sort.by("name")), 4);
+        List<EntityModel<TeamDto>> teamModels = List.of(teamModel1, teamModel2);
+        Page<EntityModel<TeamDto>> page = new PageImpl<>(teamModels, PageRequest.of(0, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TeamModel> pagedModel = teamPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TeamDto>> pagedModel = (PagedModel<EntityModel<TeamDto>>) teamPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -99,16 +99,16 @@ public class TeamPagedModelAssemblerImplTest {
         TeamDto teamDto1 = new TeamDto(3L, Gender.M, Category.SENIOR, 1, coachDto, Set.of(trainingSessionDto));
         TeamDto teamDto2 = new TeamDto(4L, Gender.F, Category.U11, 2, coachDto, Set.of(trainingSessionDto));
 
-        TeamModel teamModel1 = new TeamModel(teamDto1);
-        TeamModel teamModel2 = new TeamModel(teamDto2);
+        EntityModel<TeamDto> teamModel1 = EntityModel.of(teamDto1);
+        EntityModel<TeamDto> teamModel2 = EntityModel.of(teamDto2);
 
-        List<TeamModel> teamModels = List.of(teamModel1, teamModel2);
-        Page<TeamModel> page = new PageImpl<>(teamModels, PageRequest.of(1, 2, Sort.by("name")), 4);
+        List<EntityModel<TeamDto>> teamModels = List.of(teamModel1, teamModel2);
+        Page<EntityModel<TeamDto>> page = new PageImpl<>(teamModels, PageRequest.of(1, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TeamModel> pagedModel = teamPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TeamDto>> pagedModel = (PagedModel<EntityModel<TeamDto>>) teamPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -148,16 +148,16 @@ public class TeamPagedModelAssemblerImplTest {
         TeamDto teamDto1 = new TeamDto(1L, Gender.M, Category.SENIOR, 1, coachDto, Set.of(trainingSessionDto));
         TeamDto teamDto2 = new TeamDto(2L, Gender.F, Category.U11, 2, coachDto, Set.of(trainingSessionDto));
 
-        TeamModel teamModel1 = new TeamModel(teamDto1);
-        TeamModel teamModel2 = new TeamModel(teamDto2);
+        EntityModel<TeamDto> teamModel1 = EntityModel.of(teamDto1);
+        EntityModel<TeamDto> teamModel2 = EntityModel.of(teamDto2);
 
-        List<TeamModel> teamModels = List.of(teamModel1, teamModel2);
-        Page<TeamModel> page = new PageImpl<>(teamModels, PageRequest.of(0, 2, Sort.by("name")), 2);
+        List<EntityModel<TeamDto>> teamModels = List.of(teamModel1, teamModel2);
+        Page<EntityModel<TeamDto>> page = new PageImpl<>(teamModels, PageRequest.of(0, 2, Sort.by("name")), 2);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TeamModel> pagedModel = teamPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TeamDto>> pagedModel = (PagedModel<EntityModel<TeamDto>>) teamPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -196,16 +196,16 @@ public class TeamPagedModelAssemblerImplTest {
         TeamDto teamDto1 = new TeamDto(1L, Gender.M, Category.SENIOR, 1, coachDto, Set.of(trainingSessionDto));
         TeamDto teamDto2 = new TeamDto(2L, Gender.F, Category.U11, 2, coachDto, Set.of(trainingSessionDto));
 
-        TeamModel teamModel1 = new TeamModel(teamDto1);
-        TeamModel teamModel2 = new TeamModel(teamDto2);
+        EntityModel<TeamDto> teamModel1 = EntityModel.of(teamDto1);
+        EntityModel<TeamDto> teamModel2 = EntityModel.of(teamDto2);
 
-        List<TeamModel> teamModels = List.of(teamModel1, teamModel2);
-        Page<TeamModel> page = new PageImpl<>(teamModels, PageRequest.of(1, 2, Sort.by("name")), 6);
+        List<EntityModel<TeamDto>> teamModels = List.of(teamModel1, teamModel2);
+        Page<EntityModel<TeamDto>> page = new PageImpl<>(teamModels, PageRequest.of(1, 2, Sort.by("name")), 6);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<TeamModel> pagedModel = teamPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<TeamDto>> pagedModel = (PagedModel<EntityModel<TeamDto>>) teamPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();

@@ -1,16 +1,20 @@
 package fr.hoenheimsports.trainingservice.assemblers;
 
+import fr.hoenheimsports.trainingservice.Exception.DataNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.TeamControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
 import fr.hoenheimsports.trainingservice.dto.TeamDto;
 import fr.hoenheimsports.trainingservice.models.Category;
 import fr.hoenheimsports.trainingservice.models.Gender;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.core.EmbeddedWrapper;
+import org.springframework.hateoas.server.core.EmbeddedWrappers;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -25,19 +29,31 @@ public class TeamPagedModelAssemblerImpl implements TeamPagedModelAssembler{
     }
 
     @Override
-    public PagedModel<TeamModel> toModel(Page<TeamModel> entity) {
+    public PagedModel<?> toModel(Page<EntityModel<TeamDto>> entity) {
 
-        List<TeamModel> teamModels = entity.getContent();
+        List<EntityModel<TeamDto>> teamModels = entity.getContent();
         PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
                 entity.getSize(), entity.getNumber(), entity.getTotalElements(), entity.getTotalPages());
-        PagedModel<TeamModel> pagedModel = PagedModel.of(teamModels, pageMetadata);
         List<String> sort = this.sortUtil.createSortParams(entity.getSort());
 
+        PagedModel<?> pagedModel;
+        if (teamModels.isEmpty()) {
+            EmbeddedWrappers wrappers = new EmbeddedWrappers(false);
+            EmbeddedWrapper wrapper = wrappers.emptyCollectionOf(TeamDto.class);
+            List<EmbeddedWrapper> embedded = Collections.singletonList(wrapper);
+            pagedModel = PagedModel.of(embedded,pageMetadata);
+        } else {
+            pagedModel = PagedModel.of(teamModels, pageMetadata);
+        }
+
         // Add self link
+
         pagedModel.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(entity.getNumber(), entity.getSize(), sort)).withSelfRel()
                 .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDto(1L, Gender.N, Category.SENIOR,1,new CoachDto(1L, "email", "name", "phone", "surname"), Set.of())))) // skip default name
                 .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDto(1L, Gender.N, Category.SENIOR,1,new CoachDto(1L, "email", "name", "phone", "surname"), Set.of()))))
         );
+
+
 
         // Add next link if there is a next page
         if (entity.hasNext()) {

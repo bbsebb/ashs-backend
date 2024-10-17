@@ -9,7 +9,6 @@ import fr.hoenheimsports.trainingservice.mappers.HallMapper;
 import fr.hoenheimsports.trainingservice.models.Address;
 import fr.hoenheimsports.trainingservice.models.Hall;
 import fr.hoenheimsports.trainingservice.repositories.HallRepository;
-import fr.hoenheimsports.trainingservice.ressources.HallModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -17,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class HallServiceTest {
                 .name("Main Hall")
                 .address(new Address("123 Street", "City", "12345", "Country"))
                 .build();
-        HallModel hallModel = new HallModel(new HallDto(1L, "Main Hall", new AddressDto("123 Street", "City", "12345", "Country")));
+        EntityModel<HallDto> hallModel = EntityModel.of(new HallDto(1L, "Main Hall", new AddressDto("123 Street", "City", "12345", "Country")));
 
         given(hallMapper.toDto(savedHall)).willReturn(new HallDto(1L, "Main Hall", new AddressDto("123 Street", "City", "12345", "Country")));
         given(hallMapper.toEntity(hallDto)).willReturn(hall);
@@ -71,7 +71,7 @@ public class HallServiceTest {
         given(hallModelAssembler.toModel(any(HallDto.class))).willReturn(hallModel);
 
         // Act
-        HallModel createdHall = hallService.createHall(hallDto);
+        EntityModel<HallDto> createdHall = hallService.createHall(hallDto);
 
         // Assert
         assertThat(createdHall).isNotNull();
@@ -101,19 +101,26 @@ public class HallServiceTest {
                 new HallDto(1L, "Main Hall", new AddressDto("123 Street", "City", "12345", "Country")),
                 new HallDto(2L, "Secondary Hall", new AddressDto("456 Avenue", "Town", "67890", "Country"))
         );
-        List<HallModel> hallModels = Arrays.asList(
-                new HallModel(hallDtos.get(0)),
-                new HallModel(hallDtos.get(1))
+        List<EntityModel<HallDto>> hallModels = Arrays.asList(
+                EntityModel.of(hallDtos.get(0)),
+                EntityModel.of(hallDtos.get(1))
         );
-        PagedModel<HallModel> pagedModel = PagedModel.of(hallModels, new PagedModel.PageMetadata(10, 0, hallModels.size()));
+        PagedModel<EntityModel<HallDto>> pagedModel = PagedModel.of(hallModels, new PagedModel.PageMetadata(10, 0, hallModels.size()));
 
         given(sortUtil.createSort(sortParams)).willReturn(pageable.getSort());
         given(hallRepository.findAll(any(Pageable.class))).willReturn(hallPage);
         given(hallMapper.toDto(any(Hall.class))).willReturn(hallDtos.get(0), hallDtos.get(1));
-        given(hallPagedModelAssembler.toModel(ArgumentMatchers.any())).willReturn(pagedModel);
+        given(hallPagedModelAssembler.toModel(ArgumentMatchers.any())).willAnswer(invocation -> {
+            // Accès à l'argument Page<CoachModel> si nécessaire
+            Page<EntityModel<HallDto>> page = invocation.getArgument(0);
+
+            // Vous pouvez effectuer des opérations sur cet argument si nécessaire
+            // et ensuite retourner l'objet simulé
+            return pagedModel; // Retourne pagedModel
+        });
 
         // Act
-        PagedModel<HallModel> result = hallService.getAllHalls(0, 10, sortParams);
+        PagedModel<EntityModel<HallDto>> result = (PagedModel<EntityModel<HallDto>>) hallService.getAllHalls(0, 10, sortParams);
 
         // Assert
         assertThat(result).isNotNull();
@@ -142,14 +149,14 @@ public class HallServiceTest {
                 .address(new Address("123 Street", "City", "12345", "Country"))
                 .build();
         HallDto hallDto = new HallDto(1L, "Main Hall", new AddressDto("123 Street", "City", "12345", "Country"));
-        HallModel hallModel = new HallModel(hallDto);
+        EntityModel<HallDto> hallModel = EntityModel.of(hallDto);
 
         given(hallRepository.findById(1L)).willReturn(Optional.of(hall));
         given(hallMapper.toDto(hall)).willReturn(hallDto);
         given(hallModelAssembler.toModel(hallDto)).willReturn(hallModel);
 
         // Act
-        HallModel result = hallService.getHallById(1L);
+        EntityModel<HallDto> result = hallService.getHallById(1L);
 
         // Assert
         assertThat(result).isNotNull();
@@ -186,7 +193,7 @@ public class HallServiceTest {
                 .address(new Address("123 Street", "City", "12345", "Country"))
                 .build();
         HallDto updatedHallDto = new HallDto(1L, "Second Hall", new AddressDto("123 Street", "City", "12345", "Country"));
-        HallModel updatedHallModel = new HallModel(updatedHallDto);
+        EntityModel<HallDto> updatedHallModel = EntityModel.of(updatedHallDto);
 
         given(hallRepository.findById(1L)).willReturn(Optional.of(hall));
         given(hallMapper.partialUpdate(hallDto, hall)).willReturn(updatedHall);
@@ -195,7 +202,7 @@ public class HallServiceTest {
         given(hallModelAssembler.toModel(updatedHallDto)).willReturn(updatedHallModel);
 
         // Act
-        HallModel result = hallService.updateHall(1L, hallDto);
+        EntityModel<HallDto> result = hallService.updateHall(1L, hallDto);
 
         // Assert
         assertThat(result).isNotNull();

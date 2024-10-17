@@ -1,7 +1,7 @@
 package fr.hoenheimsports.trainingservice.assemblers;
 
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
+import org.springframework.hateoas.EntityModel;
 
-public interface CoachModelAssembler extends ModelAssembler<CoachDto, CoachModel>{
+public interface CoachModelAssembler extends ModelAssembler<CoachDto, EntityModel<CoachDto>>{
 }

@@ -3,7 +3,6 @@ package fr.hoenheimsports.trainingservice.assemblers;
 import fr.hoenheimsports.trainingservice.controllers.HallControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.AddressDto;
 import fr.hoenheimsports.trainingservice.dto.HallDto;
-import fr.hoenheimsports.trainingservice.ressources.HallModel;
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
@@ -44,16 +44,16 @@ public class HallPagedModelAssemblerImplTest {
         HallDto hallDto1 = new HallDto(1L, "Main Hall", addressDto);
         HallDto hallDto2 = new HallDto(2L, "Secondary Hall", addressDto);
 
-        HallModel hallModel1 = new HallModel(hallDto1);
-        HallModel hallModel2 = new HallModel(hallDto2);
+        EntityModel<HallDto> hallModel1 = EntityModel.of(hallDto1);
+        EntityModel<HallDto> hallModel2 = EntityModel.of(hallDto2);
 
-        List<HallModel> hallModels = List.of(hallModel1, hallModel2);
-        Page<HallModel> page = new PageImpl<>(hallModels, PageRequest.of(0, 2, Sort.by("name")), 4);
+        List<EntityModel<HallDto>> hallModels = List.of(hallModel1, hallModel2);
+        Page<EntityModel<HallDto>> page = new PageImpl<>(hallModels, PageRequest.of(0, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<HallModel> pagedModel = hallPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<HallDto>> pagedModel = (PagedModel<EntityModel<HallDto>>) hallPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -88,16 +88,16 @@ public class HallPagedModelAssemblerImplTest {
         HallDto hallDto1 = new HallDto(3L, "Main Hall", addressDto);
         HallDto hallDto2 = new HallDto(4L, "Secondary Hall", addressDto);
 
-        HallModel hallModel1 = new HallModel(hallDto1);
-        HallModel hallModel2 = new HallModel(hallDto2);
+        EntityModel<HallDto> hallModel1 = EntityModel.of(hallDto1);
+        EntityModel<HallDto> hallModel2 = EntityModel.of(hallDto2);
 
-        List<HallModel> hallModels = List.of(hallModel1, hallModel2);
-        Page<HallModel> page = new PageImpl<>(hallModels, PageRequest.of(1, 2, Sort.by("name")), 4);
+        List<EntityModel<HallDto>> hallModels = List.of(hallModel1, hallModel2);
+        Page<EntityModel<HallDto>> page = new PageImpl<>(hallModels, PageRequest.of(1, 2, Sort.by("name")), 4);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<HallModel> pagedModel = hallPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<HallDto>> pagedModel = (PagedModel<EntityModel<HallDto>>) hallPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -132,16 +132,16 @@ public class HallPagedModelAssemblerImplTest {
         HallDto hallDto1 = new HallDto(1L, "Main Hall", addressDto);
         HallDto hallDto2 = new HallDto(2L, "Secondary Hall", addressDto);
 
-        HallModel hallModel1 = new HallModel(hallDto1);
-        HallModel hallModel2 = new HallModel(hallDto2);
+        EntityModel<HallDto> hallModel1 = EntityModel.of(hallDto1);
+        EntityModel<HallDto> hallModel2 = EntityModel.of(hallDto2);
 
-        List<HallModel> hallModels = List.of(hallModel1, hallModel2);
-        Page<HallModel> page = new PageImpl<>(hallModels, PageRequest.of(0, 2, Sort.by("name")), 2);
+        List<EntityModel<HallDto>> hallModels = List.of(hallModel1, hallModel2);
+        Page<EntityModel<HallDto>> page = new PageImpl<>(hallModels, PageRequest.of(0, 2, Sort.by("name")), 2);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<HallModel> pagedModel = hallPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<HallDto>> pagedModel = (PagedModel<EntityModel<HallDto>>) hallPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();
@@ -174,16 +174,16 @@ public class HallPagedModelAssemblerImplTest {
         HallDto hallDto1 = new HallDto(1L, "Main Hall", addressDto);
         HallDto hallDto2 = new HallDto(2L, "Secondary Hall", addressDto);
 
-        HallModel hallModel1 = new HallModel(hallDto1);
-        HallModel hallModel2 = new HallModel(hallDto2);
+        EntityModel<HallDto> hallModel1 = EntityModel.of(hallDto1);
+        EntityModel<HallDto> hallModel2 = EntityModel.of(hallDto2);
 
-        List<HallModel> hallModels = List.of(hallModel1, hallModel2);
-        Page<HallModel> page = new PageImpl<>(hallModels, PageRequest.of(1, 2, Sort.by("name")), 6);
+        List<EntityModel<HallDto>> hallModels = List.of(hallModel1, hallModel2);
+        Page<EntityModel<HallDto>> page = new PageImpl<>(hallModels, PageRequest.of(1, 2, Sort.by("name")), 6);
 
         given(sortUtil.createSortParams(Sort.by("name"))).willReturn(List.of("name,asc"));
 
         // Act
-        PagedModel<HallModel> pagedModel = hallPagedModelAssemblerImpl.toModel(page);
+        PagedModel<EntityModel<HallDto>> pagedModel = (PagedModel<EntityModel<HallDto>>) hallPagedModelAssemblerImpl.toModel(page);
 
         // Assert
         assertThat(pagedModel).isNotNull();

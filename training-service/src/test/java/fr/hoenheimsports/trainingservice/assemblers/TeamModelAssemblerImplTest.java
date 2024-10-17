@@ -9,9 +9,9 @@ import fr.hoenheimsports.trainingservice.controllers.TrainingSessionControllerIm
 import fr.hoenheimsports.trainingservice.dto.*;
 import fr.hoenheimsports.trainingservice.models.Category;
 import fr.hoenheimsports.trainingservice.models.Gender;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
 import java.time.DayOfWeek;
@@ -41,7 +41,7 @@ public class TeamModelAssemblerImplTest {
         TeamDto teamDto = new TeamDto(1L, Gender.N, Category.SENIOR, 1, coachDto, Set.of(trainingSessionDto));
 
         // Act
-        TeamModel teamModel = teamModelAssemblerImpl.toModel(teamDto);
+        EntityModel<TeamDto> teamModel = teamModelAssemblerImpl.toModel(teamDto);
 
         // Assert
         assertThat(teamModel).isNotNull();

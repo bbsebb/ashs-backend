@@ -2,9 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/instagram-service/src/main/resources/db/migration/V1__Create_access_tokens_table.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/instagram-service/src/main/resources/db/migration/V2__Insert_access_token.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/training-service/src/main/resources/db/migration/V1__Initial_structure.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/training-service/src/main/resources/db/migration/V2__test.sql" dialect="GenericSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

@@ -1,18 +1,22 @@
 package fr.hoenheimsports.trainingservice.assemblers;
 
+import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.TrainingSessionControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.AddressDto;
 import fr.hoenheimsports.trainingservice.dto.HallDto;
 import fr.hoenheimsports.trainingservice.dto.TimeSlotDto;
 import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.core.EmbeddedWrapper;
+import org.springframework.hateoas.server.core.EmbeddedWrappers;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -26,20 +30,32 @@ public class TrainingSessionPagedModelAssemblerImpl implements TrainingSessionPa
     }
 
     @Override
-    public PagedModel<TrainingSessionModel> toModel(Page<TrainingSessionModel> entity) {
+    public PagedModel<?> toModel(Page<EntityModel<TrainingSessionDto>> entity) {
 
-        List<TrainingSessionModel> trainingSessionModels = entity.getContent();
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = entity.getContent();
         PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
                 entity.getSize(), entity.getNumber(), entity.getTotalElements(), entity.getTotalPages());
-        PagedModel<TrainingSessionModel> pagedModel = PagedModel.of(trainingSessionModels, pageMetadata);
+
         List<String> sort = this.sortUtil.createSortParams(entity.getSort());
+
+        PagedModel<?> pagedModel;
+        if (trainingSessionModels.isEmpty()) {
+            EmbeddedWrappers wrappers = new EmbeddedWrappers(false);
+            EmbeddedWrapper wrapper = wrappers.emptyCollectionOf(TrainingSessionDto.class);
+            List<EmbeddedWrapper> embedded = Collections.singletonList(wrapper);
+            pagedModel = PagedModel.of(embedded,pageMetadata);
+        } else {
+            pagedModel = PagedModel.of(trainingSessionModels, pageMetadata);
+        }
 
         var trainingSessionDto = new TrainingSessionDto(1L,new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.now(), LocalTime.now()),new HallDto(1L, "name", new AddressDto("street", "city", "postalCode", "country")));
         // Add self link
+
         pagedModel.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(entity.getNumber(), entity.getSize(), sort)).withSelfRel()
                 .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDto))) // skip default name
                 .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDto)))
         );
+
 
         // Add next link if there is a next page
         if (entity.hasNext()) {

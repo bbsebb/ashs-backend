@@ -4,9 +4,9 @@ import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.controllers.HallControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.AddressDto;
 import fr.hoenheimsports.trainingservice.dto.HallDto;
-import fr.hoenheimsports.trainingservice.ressources.HallModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +28,7 @@ public class HallModelAssemblerImplTest {
         HallDto hallDto = new HallDto(1L, "Main Hall", new AddressDto("1", "Rue de la République", "Hoenheim", "67800"));
 
         // Act
-        HallModel hallModel = hallModelAssemblerImpl.toModel(hallDto);
+        EntityModel<HallDto> hallModel = hallModelAssemblerImpl.toModel(hallDto);
 
         // Assert
         assertThat(hallModel).isNotNull();

@@ -10,5 +10,5 @@ import java.io.Serializable;
  * DTO for {@link Hall}
  */
 @Relation(collectionRelation = "halls")
-public record HallDto(@JsonIgnore Long id, String name, AddressDto address) implements Serializable {
+public record HallDto(Long id, String name, AddressDto address) implements Serializable {
 }

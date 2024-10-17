@@ -2,12 +2,15 @@ package fr.hoenheimsports.trainingservice.assemblers;
 
 import fr.hoenheimsports.trainingservice.controllers.CoachControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
 import fr.hoenheimsports.trainingservice.services.SortUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.core.EmbeddedWrapper;
+import org.springframework.hateoas.server.core.EmbeddedWrappers;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -22,13 +25,25 @@ public class CoachPagedModelAssemblerImpl implements CoachPagedModelAssembler{
     }
 
     @Override
-    public PagedModel<CoachModel> toModel(Page<CoachModel> entity) {
-        List<CoachModel> coachModels = entity.getContent();
+    public PagedModel<?> toModel(Page<EntityModel<CoachDto>> entity) {
+        List<EntityModel<CoachDto>> coachModels = entity.getContent();
         PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
                 entity.getSize(), entity.getNumber(), entity.getTotalElements(), entity.getTotalPages());
         List<String> sort = this.sortUtil.createSortParams(entity.getSort());
 
-        PagedModel<CoachModel> pagedModel = PagedModel.of(coachModels, pageMetadata);
+
+
+
+        PagedModel<?> pagedModel;
+        if (coachModels.isEmpty()) {
+            EmbeddedWrappers wrappers = new EmbeddedWrappers(false);
+            EmbeddedWrapper wrapper = wrappers.emptyCollectionOf(CoachDto.class);
+            List<EmbeddedWrapper> embedded = Collections.singletonList(wrapper);
+            pagedModel = PagedModel.of(embedded,pageMetadata);
+        } else {
+            pagedModel = PagedModel.of(coachModels, pageMetadata);
+        }
+
 
         // Add self link
         pagedModel.add(linkTo(methodOn(CoachControllerImpl.class).getAllCoaches(entity.getNumber(), entity.getSize(), sort)).withSelfRel()
@@ -53,6 +68,9 @@ public class CoachPagedModelAssemblerImpl implements CoachPagedModelAssembler{
         int lastPage = entity.getTotalPages() - 1;
         pagedModel.add(linkTo(methodOn(CoachControllerImpl.class).getAllCoaches(lastPage, entity.getSize(), sort)).withRel("last").expand());
 
+
         return pagedModel;
     }
+
+
 }

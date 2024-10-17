@@ -11,7 +11,7 @@ public class TrainingSession {
     private Long id;
     @Embedded
     private TimeSlot timeSlot;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Hall hall;
 
 

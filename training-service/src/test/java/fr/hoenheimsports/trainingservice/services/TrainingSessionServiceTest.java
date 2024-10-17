@@ -1,5 +1,7 @@
 package fr.hoenheimsports.trainingservice.services;
 
+import fr.hoenheimsports.trainingservice.Exception.DataNotFoundException;
+import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
 import fr.hoenheimsports.trainingservice.assemblers.TrainingSessionModelAssembler;
 import fr.hoenheimsports.trainingservice.assemblers.TrainingSessionPagedModelAssembler;
@@ -8,8 +10,9 @@ import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
 import fr.hoenheimsports.trainingservice.mappers.TrainingSessionMapper;
 import fr.hoenheimsports.trainingservice.models.TimeSlot;
 import fr.hoenheimsports.trainingservice.models.TrainingSession;
+import fr.hoenheimsports.trainingservice.repositories.HallRepository;
 import fr.hoenheimsports.trainingservice.repositories.TrainingSessionRepository;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -17,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.time.DayOfWeek;
@@ -38,6 +42,9 @@ public class TrainingSessionServiceTest {
     private TrainingSessionRepository trainingSessionRepository;
 
     @Mock
+    private HallRepository hallRepository;
+
+    @Mock
     private TrainingSessionModelAssembler trainingSessionModelAssembler;
 
     @Mock
@@ -53,7 +60,7 @@ public class TrainingSessionServiceTest {
     private TrainingSessionServiceImpl trainingSessionService;
 
     @Test
-    void createTrainingSession_ValidTrainingSessionDto_ReturnsTrainingSessionModel() {
+    void createTrainingSession_ValidTrainingSessionDto_ReturnsTrainingSessionModel() throws HallNotFoundException {
         TrainingSessionDto trainingSessionDto = new TrainingSessionDto(null, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null);
         TrainingSession trainingSession = TrainingSession.builder()
                 .timeSlot(new TimeSlot(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)))
@@ -62,14 +69,15 @@ public class TrainingSessionServiceTest {
                 .id(1L)
                 .timeSlot(new TimeSlot(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)))
                 .build();
-        TrainingSessionModel trainingSessionModel = new TrainingSessionModel(new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null));
+        EntityModel<TrainingSessionDto> trainingSessionModel = EntityModel.of(new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null));
 
         given(trainingSessionMapper.toEntity(trainingSessionDto)).willReturn(trainingSession);
         given(trainingSessionRepository.save(any(TrainingSession.class))).willReturn(savedTrainingSession);
+//        given(hallRepository.save(any())).willReturn(savedTrainingSession.getHall());
         given(trainingSessionMapper.toDto(savedTrainingSession)).willReturn(new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null));
         given(trainingSessionModelAssembler.toModel(any(TrainingSessionDto.class))).willReturn(trainingSessionModel);
 
-        TrainingSessionModel createdTrainingSession = trainingSessionService.createTrainingSession(trainingSessionDto);
+        EntityModel<TrainingSessionDto> createdTrainingSession = trainingSessionService.createTrainingSession(trainingSessionDto);
 
         assertThat(createdTrainingSession).isNotNull();
         assertThat(Objects.requireNonNull(createdTrainingSession.getContent()).id()).isEqualTo(1L);
@@ -95,18 +103,27 @@ public class TrainingSessionServiceTest {
                 new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null),
                 new TrainingSessionDto(2L, new TimeSlotDto(DayOfWeek.TUESDAY, LocalTime.of(14, 0), LocalTime.of(16, 0)), null)
         );
-        List<TrainingSessionModel> trainingSessionModels = Arrays.asList(
-                new TrainingSessionModel(trainingSessionDtos.get(0)),
-                new TrainingSessionModel(trainingSessionDtos.get(1))
+        List<EntityModel<TrainingSessionDto>> trainingSessionModels = Arrays.asList(
+                EntityModel.of(trainingSessionDtos.get(0)),
+                EntityModel.of(trainingSessionDtos.get(1))
         );
-        PagedModel<TrainingSessionModel> pagedModel = PagedModel.of(trainingSessionModels, new PagedModel.PageMetadata(10, 0, trainingSessionModels.size()));
+        PagedModel<EntityModel<TrainingSessionDto>> pagedModel = PagedModel.of(trainingSessionModels, new PagedModel.PageMetadata(10, 0, trainingSessionModels.size()));
 
         given(sortUtil.createSort(sortParams)).willReturn(pageable.getSort());
         given(trainingSessionRepository.findAll(any(Pageable.class))).willReturn(trainingSessionPage);
-        given(trainingSessionMapper.toDto(any(TrainingSession.class))).willReturn(trainingSessionDtos.get(0), trainingSessionDtos.get(1));
-        given(trainingSessionPagedModelAssembler.toModel(ArgumentMatchers.any())).willReturn(pagedModel);
 
-        PagedModel<TrainingSessionModel> result = trainingSessionService.getAllTrainingSessions(0, 10, sortParams);
+        given(trainingSessionMapper.toDto(any(TrainingSession.class))).willReturn(trainingSessionDtos.get(0), trainingSessionDtos.get(1));
+
+        given(trainingSessionPagedModelAssembler.toModel(ArgumentMatchers.any())).willAnswer(invocation -> {
+            // Accès à l'argument Page<CoachModel> si nécessaire
+            Page<EntityModel<TrainingSessionDto>> page = invocation.getArgument(0);
+
+            // Vous pouvez effectuer des opérations sur cet argument si nécessaire
+            // et ensuite retourner l'objet simulé
+            return pagedModel; // Retourne pagedModel
+        });
+
+        PagedModel<EntityModel<TrainingSessionDto>> result = (PagedModel<EntityModel<TrainingSessionDto>>) trainingSessionService.getAllTrainingSessions(0, 10, sortParams);
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(2).containsExactlyInAnyOrderElementsOf(trainingSessionModels);
@@ -130,13 +147,13 @@ public class TrainingSessionServiceTest {
                 .timeSlot(new TimeSlot(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)))
                 .build();
         TrainingSessionDto trainingSessionDto = new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null);
-        TrainingSessionModel trainingSessionModel = new TrainingSessionModel(trainingSessionDto);
+        EntityModel<TrainingSessionDto> trainingSessionModel = EntityModel.of(trainingSessionDto);
 
         given(trainingSessionRepository.findById(1L)).willReturn(Optional.of(trainingSession));
         given(trainingSessionMapper.toDto(trainingSession)).willReturn(trainingSessionDto);
         given(trainingSessionModelAssembler.toModel(trainingSessionDto)).willReturn(trainingSessionModel);
 
-        TrainingSessionModel result = trainingSessionService.getTrainingSessionById(1L);
+        EntityModel<TrainingSessionDto> result = trainingSessionService.getTrainingSessionById(1L);
 
         assertThat(result).isNotNull();
         assertThat(Objects.requireNonNull(result.getContent()).id()).isEqualTo(1L);
@@ -156,7 +173,7 @@ public class TrainingSessionServiceTest {
     }
 
     @Test
-    void updateTrainingSession_ValidIdAndTrainingSessionDto_ReturnsUpdatedTrainingSessionModel() throws TrainingSessionNotFoundException {
+    void updateTrainingSession_ValidIdAndTrainingSessionDto_ReturnsUpdatedTrainingSessionModel() throws DataNotFoundException {
         TrainingSessionDto trainingSessionDto = new TrainingSessionDto(null, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null);
         TrainingSession trainingSession = TrainingSession.builder()
                 .id(1L)
@@ -167,15 +184,16 @@ public class TrainingSessionServiceTest {
                 .timeSlot(new TimeSlot(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)))
                 .build();
         TrainingSessionDto updatedTrainingSessionDto = new TrainingSessionDto(1L, new TimeSlotDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(12, 0)), null);
-        TrainingSessionModel updatedTrainingSessionModel = new TrainingSessionModel(updatedTrainingSessionDto);
+        EntityModel<TrainingSessionDto> updatedTrainingSessionModel = EntityModel.of(updatedTrainingSessionDto);
 
         given(trainingSessionRepository.findById(1L)).willReturn(Optional.of(trainingSession));
+//        given(hallRepository.save(any())).willReturn(trainingSession.getHall());
         given(trainingSessionMapper.partialUpdate(trainingSessionDto, trainingSession)).willReturn(updatedTrainingSession);
         given(trainingSessionRepository.save(any(TrainingSession.class))).willReturn(updatedTrainingSession);
         given(trainingSessionMapper.toDto(updatedTrainingSession)).willReturn(updatedTrainingSessionDto);
         given(trainingSessionModelAssembler.toModel(updatedTrainingSessionDto)).willReturn(updatedTrainingSessionModel);
 
-        TrainingSessionModel result = trainingSessionService.updateTrainingSession(1L, trainingSessionDto);
+        EntityModel<TrainingSessionDto> result = trainingSessionService.updateTrainingSession(1L, trainingSessionDto);
 
         assertThat(result).isNotNull();
         assertThat(Objects.requireNonNull(result.getContent()).id()).isEqualTo(1L);

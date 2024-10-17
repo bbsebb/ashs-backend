@@ -7,7 +7,7 @@ import fr.hoenheimsports.trainingservice.controllers.CoachControllerImpl;
 import fr.hoenheimsports.trainingservice.controllers.TeamControllerImpl;
 import fr.hoenheimsports.trainingservice.controllers.TrainingSessionControllerImpl;
 import fr.hoenheimsports.trainingservice.dto.TeamDto;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -15,8 +15,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Component
 public class TeamModelAssemblerImpl implements TeamModelAssembler{
     @Override
-    public TeamModel toModel(TeamDto entity) {
-        TeamModel teamModel = new TeamModel(entity);
+    public EntityModel<TeamDto> toModel(TeamDto entity) {
+        EntityModel<TeamDto> teamModel = EntityModel.of(entity);
         try {
             teamModel.add(
                     linkTo(methodOn(TeamControllerImpl.class).getTeamById(entity.id())).withSelfRel()

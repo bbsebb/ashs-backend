@@ -1,15 +1,15 @@
 package fr.hoenheimsports.trainingservice.services;
 
+import fr.hoenheimsports.trainingservice.Exception.DataNotFoundException;
 import fr.hoenheimsports.trainingservice.Exception.TeamNotFoundException;
 import fr.hoenheimsports.trainingservice.assemblers.TeamModelAssembler;
 import fr.hoenheimsports.trainingservice.assemblers.TeamPagedModelAssembler;
 import fr.hoenheimsports.trainingservice.dto.TeamDto;
 import fr.hoenheimsports.trainingservice.mappers.TeamMapper;
-import fr.hoenheimsports.trainingservice.models.Category;
-import fr.hoenheimsports.trainingservice.models.Gender;
-import fr.hoenheimsports.trainingservice.models.Team;
+import fr.hoenheimsports.trainingservice.models.*;
+import fr.hoenheimsports.trainingservice.repositories.CoachRepository;
 import fr.hoenheimsports.trainingservice.repositories.TeamRepository;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
+import fr.hoenheimsports.trainingservice.repositories.TrainingSessionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 
 import java.util.Arrays;
@@ -35,6 +36,12 @@ public class TeamServiceTest {
     @Mock
     private TeamRepository teamRepository;
 
+    //@Mock
+    //private CoachRepository coachRepository;
+
+    //@Mock
+    //private TrainingSessionRepository trainingSessionRepository;
+
     @Mock
     private TeamModelAssembler teamModelAssembler;
 
@@ -51,7 +58,7 @@ public class TeamServiceTest {
     private TeamServiceImpl teamService;
 
     @Test
-    void createTeam_ValidTeamDto_ReturnsTeamModel() {
+    void createTeam_ValidTeamDto_ReturnsTeamModel()   {
         TeamDto teamDto = new TeamDto(null, Gender.M, Category.U15, 1, null, null);
         Team team = Team.builder()
                 .gender(Gender.M)
@@ -64,14 +71,20 @@ public class TeamServiceTest {
                 .category(Category.U15)
                 .teamNumber(1)
                 .build();
-        TeamModel teamModel = new TeamModel(new TeamDto(1L, Gender.M, Category.U15, 1, null, null));
+        EntityModel<TeamDto> teamModel = EntityModel.of(new TeamDto(1L, Gender.M, Category.U15, 1, null, null));
 
         given(teamRepository.save(any(Team.class))).willReturn(savedTeam);
+        // Créer un Answer personnalisé qui retourne simplement l'objet qu'il reçoit
+/*        given(trainingSessionRepository.save(any(TrainingSession.class))).willAnswer(invocation -> {
+            // Simuler une action sur chaque créneau si nécessaire
+            return invocation.<TrainingSession>getArgument(0); // Retourner la session comme si elle avait été sauvegardée
+        });*/
+/*        given(coachRepository.save(any(Coach.class))).willReturn(savedTeam.getCoach());*/
         given(teamMapper.toEntity(teamDto)).willReturn(team);
         given(teamMapper.toDto(savedTeam)).willReturn(new TeamDto(1L, Gender.M, Category.U15, 1, null, null));
         given(teamModelAssembler.toModel(any(TeamDto.class))).willReturn(teamModel);
 
-        TeamModel createdTeam = teamService.createTeam(teamDto);
+        EntityModel<TeamDto> createdTeam = teamService.createTeam(teamDto);
 
         assertThat(createdTeam).isNotNull();
         assertThat(Objects.requireNonNull(createdTeam.getContent()).id()).isEqualTo(1L);
@@ -101,18 +114,25 @@ public class TeamServiceTest {
                 new TeamDto(1L, Gender.M, Category.U15, 1, null, null),
                 new TeamDto(2L, Gender.F, Category.U13, 2, null, null)
         );
-        List<TeamModel> teamModels = Arrays.asList(
-                new TeamModel(teamDtos.get(0)),
-                new TeamModel(teamDtos.get(1))
+        List<EntityModel<TeamDto>> teamModels = Arrays.asList(
+                EntityModel.of(teamDtos.get(0)),
+                EntityModel.of(teamDtos.get(1))
         );
-        PagedModel<TeamModel> pagedModel = PagedModel.of(teamModels, new PagedModel.PageMetadata(10, 0, teamModels.size()));
+        PagedModel<EntityModel<TeamDto>> pagedModel = PagedModel.of(teamModels, new PagedModel.PageMetadata(10, 0, teamModels.size()));
 
         given(sortUtil.createSort(sortParams)).willReturn(pageable.getSort());
         given(teamRepository.findAll(any(Pageable.class))).willReturn(teamPage);
         given(teamMapper.toDto(any(Team.class))).willReturn(teamDtos.get(0), teamDtos.get(1));
-        given(teamPagedModelAssembler.toModel(ArgumentMatchers.any())).willReturn(pagedModel);
+        given(teamPagedModelAssembler.toModel(ArgumentMatchers.any())).willAnswer(invocation -> {
+            // Accès à l'argument Page<CoachModel> si nécessaire
+            Page<EntityModel<TeamDto>> page = invocation.getArgument(0);
 
-        PagedModel<TeamModel> result = teamService.getAllTeams(0, 10, sortParams);
+            // Vous pouvez effectuer des opérations sur cet argument si nécessaire
+            // et ensuite retourner l'objet simulé
+            return pagedModel; // Retourne pagedModel
+        });
+
+        PagedModel<EntityModel<TeamDto>> result = (PagedModel<EntityModel<TeamDto>>) teamService.getAllTeams(0, 10, sortParams);
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(2).containsExactlyInAnyOrderElementsOf(teamModels);
@@ -138,13 +158,13 @@ public class TeamServiceTest {
                 .teamNumber(1)
                 .build();
         TeamDto teamDto = new TeamDto(1L, Gender.M, Category.U15, 1, null, null);
-        TeamModel teamModel = new TeamModel(teamDto);
+        EntityModel<TeamDto> teamModel = EntityModel.of(teamDto);
 
         given(teamRepository.findById(1L)).willReturn(Optional.of(team));
         given(teamMapper.toDto(team)).willReturn(teamDto);
         given(teamModelAssembler.toModel(teamDto)).willReturn(teamModel);
 
-        TeamModel result = teamService.getTeamById(1L);
+        EntityModel<TeamDto> result = teamService.getTeamById(1L);
 
         assertThat(result).isNotNull();
         assertThat(Objects.requireNonNull(result.getContent()).id()).isEqualTo(1L);
@@ -179,7 +199,7 @@ public class TeamServiceTest {
                 .teamNumber(1)
                 .build();
         TeamDto updatedTeamDto = new TeamDto(1L, Gender.M, Category.U15, 1, null, null);
-        TeamModel updatedTeamModel = new TeamModel(updatedTeamDto);
+        EntityModel<TeamDto> updatedTeamModel = EntityModel.of(updatedTeamDto);
 
         given(teamRepository.findById(1L)).willReturn(Optional.of(team));
         given(teamMapper.partialUpdate(teamDto, team)).willReturn(updatedTeam);
@@ -187,7 +207,7 @@ public class TeamServiceTest {
         given(teamMapper.toDto(updatedTeam)).willReturn(updatedTeamDto);
         given(teamModelAssembler.toModel(updatedTeamDto)).willReturn(updatedTeamModel);
 
-        TeamModel result = teamService.updateTeam(1L, teamDto);
+        EntityModel<TeamDto> result = teamService.updateTeam(1L, teamDto);
 
         assertThat(result).isNotNull();
         assertThat(Objects.requireNonNull(result.getContent()).id()).isEqualTo(1L);

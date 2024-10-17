@@ -7,9 +7,9 @@ import fr.hoenheimsports.trainingservice.dto.CoachDto;
 import fr.hoenheimsports.trainingservice.mappers.CoachMapper;
 import fr.hoenheimsports.trainingservice.models.Coach;
 import fr.hoenheimsports.trainingservice.repositories.CoachRepository;
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
@@ -32,13 +32,13 @@ public class CoachServiceImpl implements CoachService {
     }
 
     @Override
-    public CoachModel createCoach(CoachDto coachDto) {
+    public EntityModel<CoachDto> createCoach(CoachDto coachDto) {
         Coach savedCoach = coachRepository.save(Coach.builder().email(coachDto.email()).name(coachDto.name()).phone(coachDto.phone()).surname(coachDto.surname()).build());
         return coachModelAssemblerImpl.toModel(coachMapper.toDto(savedCoach));
     }
 
     @Override
-    public PagedModel<CoachModel> getAllCoaches(int page, int size, List<String> sort) {
+    public PagedModel<?> getAllCoaches(int page, int size, List<String> sort) {
 
         sort = (sort == null || sort.isEmpty())?  List.of("name,asc") : sort;
         Pageable pageable = PageRequest.of(page, size, this.sortUtil.createSort(sort));
@@ -48,12 +48,12 @@ public class CoachServiceImpl implements CoachService {
 
 
     @Override
-    public CoachModel getCoachById(Long id) throws CoachNotFoundException {
+    public EntityModel<CoachDto> getCoachById(Long id) throws CoachNotFoundException {
         return coachRepository.findById(id).map(coachMapper::toDto).map(coachModelAssemblerImpl::toModel).orElseThrow(CoachNotFoundException::new);
     }
 
     @Override
-    public CoachModel updateCoach(Long id, CoachDto coachDto) throws CoachNotFoundException {
+    public EntityModel<CoachDto> updateCoach(Long id, CoachDto coachDto) throws CoachNotFoundException {
         Coach coachToUpdate = coachRepository.findById(id).orElseThrow(CoachNotFoundException::new);
         coachToUpdate.setEmail(coachDto.email());
         coachToUpdate.setName(coachDto.name());

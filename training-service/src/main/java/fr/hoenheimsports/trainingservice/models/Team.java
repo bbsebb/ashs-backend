@@ -6,7 +6,8 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Team {
+public class
+ Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,9 +16,9 @@ public class Team {
     @Enumerated(EnumType.ORDINAL)
     private Category category;
     private int teamNumber;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Coach coach;
-    @OneToMany(cascade = {CascadeType.REMOVE})
+    @OneToMany(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     @JoinTable(
             name = "team_training_session",
             joinColumns = @JoinColumn(name = "team_id"),
