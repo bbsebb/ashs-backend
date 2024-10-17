@@ -1,0 +1,14 @@
+### POST request to encrypt a value
+POST http://localhost:8080/config-service/encrypt
+X-API-KEY: oFuDc342yul4rT9lILrUrLmnTmQHBI0Uwr4uQQf6hrs=
+Content-Type: text/plain
+
+pbqy@KzO^{#SF=(X6rknnQ8'Go
+###
+### POST request to decrypt a value
+POST http://localhost:8080/config-service/decrypt
+X-API-KEY: oFuDc342yul4rT9lILrUrLmnTmQHBI0Uwr4uQQf6hrs=
+Content-Type: text/plain
+
+AQAAb655PrmgnJJhVyjkXZQQojwqRnTpayHIrEClaSEqbTHDlkXbOeGo3I4oX+Kkk+Gfdffed7gPaFcydz4U0YAb49JuSlUuogdCAmeRAJPGasYsB4mov8I/mZPOMEEBBQd1jThHEsMWsID7GG15rht4fVmB8D3vQYLr/Oo6WqRHwzItSURDVVJlonjhnTuCDni7MHKZGyGN6TxAG3vAeb2sRhYqsQyluRA9oPH62OmauTpxhjqCb0OJ8gV/+HpvndmRs4x+tfALzJ4WDaDUsReuwE2h+fCNZ21vjvbRyGoCPiXalUYbXchLhR0yKMenVh8I93cTFlqgcCm2jf94roReNr7b7GmWrNqdMItQ9pX2AhN3yW46qjLFbbn5JtOTXkcFdE614kmLcTrJTCFATtL4
+###
