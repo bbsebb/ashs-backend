@@ -1,69 +1,79 @@
 package fr.hoenheimsports.trainingservice.services;
 
 import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
-import fr.hoenheimsports.trainingservice.assemblers.HallModelAssembler;
-import fr.hoenheimsports.trainingservice.assemblers.HallPagedModelAssembler;
-import fr.hoenheimsports.trainingservice.dto.HallDto;
+import fr.hoenheimsports.trainingservice.assemblers.HallAssembler;
+import fr.hoenheimsports.trainingservice.dto.HallDTO;
+import fr.hoenheimsports.trainingservice.dto.request.HallDTORequest;
 import fr.hoenheimsports.trainingservice.mappers.HallMapper;
 import fr.hoenheimsports.trainingservice.models.Hall;
 import fr.hoenheimsports.trainingservice.repositories.HallRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class HallServiceImpl implements HallService {
     private final HallRepository hallRepository;
-    private final HallModelAssembler hallModelAssembler;
-    private final HallPagedModelAssembler hallPagedModelAssembler;
+    private final HallAssembler hallAssembler;
     private final HallMapper hallMapper;
-    private final SortUtil sortUtil;
 
-    public HallServiceImpl(HallRepository hallRepository, HallModelAssembler hallModelAssemblerImpl, HallPagedModelAssembler hallPagedModelAssembler, HallMapper hallMapper, SortUtil sortUtil) {
+    public HallServiceImpl(HallRepository hallRepository, HallAssembler hallAssembler, HallMapper hallMapper) {
         this.hallRepository = hallRepository;
-        this.hallModelAssembler = hallModelAssemblerImpl;
-        this.hallPagedModelAssembler = hallPagedModelAssembler;
+        this.hallAssembler = hallAssembler;
         this.hallMapper = hallMapper;
-        this.sortUtil = sortUtil;
     }
 
     @Override
-    public EntityModel<HallDto> createHall(HallDto hallDto) {
-       Hall newHall = this.hallRepository.save(this.hallMapper.toEntity(hallDto));
-         return this.hallModelAssembler.toModel(this.hallMapper.toDto(newHall));
+    public HallDTO createAndConvertToModel(HallDTORequest hallDtoRequest) {
+        return this.hallAssembler.toModel(this.create(hallDtoRequest));
+    }
+
+    private Hall create(HallDTORequest hallDtoRequest) {
+        return hallRepository.save(hallMapper.toEntity(hallDtoRequest));
     }
 
     @Override
-    public PagedModel<?> getAllHalls(int page, int size, List<String> sort) {
-        Pageable pageable = PageRequest.of(page, size, this.sortUtil.createSort(sort));
-        return hallPagedModelAssembler.toModel(hallRepository.findAll(pageable).map(hallMapper::toDto).map(hallModelAssembler::toModel));
+    public Hall findOrCreateOrUpdate(HallDTORequest hallDtoRequest) {
+        if (hallDtoRequest == null) {
+            throw new HallNotFoundException();
+        }
+        Hall hall;
+        if (hallDtoRequest.id() != null) {
+            hall = this.update(hallDtoRequest.id(), hallDtoRequest);
+        } else {
+            hall = this.create(hallDtoRequest);
+        }
+
+        return hall;
     }
 
     @Override
-    public EntityModel<HallDto> getHallById(Long id) throws HallNotFoundException {
+    public PagedModel<HallDTO> getAllModels(Pageable pageable) {
+        return hallAssembler.toPagedModel(hallRepository.findAll(pageable));
+    }
+
+    @Override
+    public HallDTO getModelById(Long id) {
 
         return hallRepository.findById(id)
-                .map(hallMapper::toDto)
-                .map(hallModelAssembler::toModel).orElseThrow(HallNotFoundException::new);
+                .map(hallAssembler::toModel).orElseThrow(HallNotFoundException::new);
     }
 
     @Override
-    public EntityModel<HallDto> updateHall(Long id, HallDto hallDto) throws HallNotFoundException {
+    public HallDTO updateAndConvertToModel(Long id, HallDTORequest hallDtoRequest) {
+        return hallAssembler.toModel(this.update(id, hallDtoRequest));
+    }
+
+    private Hall update(Long id, HallDTORequest hallDtoRequest) {
         Hall existingHall = hallRepository.findById(id)
                 .orElseThrow(HallNotFoundException::new);
-
-        Hall updatedHall = hallMapper.partialUpdate(hallDto, existingHall);
+        Hall updatedHall = hallMapper.partialUpdate(hallDtoRequest, existingHall);
         updatedHall = hallRepository.save(updatedHall);
-
-        return hallModelAssembler.toModel(hallMapper.toDto(updatedHall));
+        return updatedHall;
     }
 
     @Override
-    public void deleteHall(Long id) {
+    public void deleteById(Long id) {
         hallRepository.deleteById(id);
     }
 }

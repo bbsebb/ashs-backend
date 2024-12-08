@@ -1,6 +1,7 @@
 package fr.hoenheimsports.trainingservice.mappers;
 
-import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
+import fr.hoenheimsports.trainingservice.dto.TrainingSessionDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
 import fr.hoenheimsports.trainingservice.models.TrainingSession;
 import org.mapstruct.*;
 
@@ -8,10 +9,10 @@ import org.mapstruct.*;
 public interface TrainingSessionMapper {
 
 
-    TrainingSession toEntity(TrainingSessionDto trainingSessionDto);
-
-    TrainingSessionDto toDto(TrainingSession trainingSession);
+    TrainingSession toEntity(TrainingSessionDTORequest trainingSessionDtoRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    TrainingSession partialUpdate(TrainingSessionDto trainingSessionDto,@MappingTarget TrainingSession existingTrainingSession);
+    TrainingSession partialUpdate(TrainingSessionDTORequest trainingSessionDtoRequest, @MappingTarget TrainingSession existingTrainingSession);
+
+    TrainingSessionDTO toDto(TrainingSession trainingSession);
 }

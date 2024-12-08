@@ -1,28 +1,24 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
-import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.HallDto;
-import org.springframework.hateoas.EntityModel;
+import fr.hoenheimsports.trainingservice.dto.HallDTO;
+import fr.hoenheimsports.trainingservice.dto.request.HallDTORequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 public interface HallController {
     @GetMapping
-    PagedModel<?> getAllHalls(@RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "20") int size,
-                                      @RequestParam(name = "sort", required = false) List<String> sort);
+    PagedModel<HallDTO> getAllHalls(Pageable pageable);
 
     @GetMapping("/{id}")
-    EntityModel<HallDto> getHallById(@PathVariable Long id) throws HallNotFoundException;
+    HallDTO getHallById(@PathVariable Long id);
 
     @PostMapping
-    EntityModel<HallDto> createHall(@RequestBody HallDto newHall);
+    HallDTO createHall(@RequestBody HallDTORequest newHall);
 
     @PutMapping("/{id}")
-    EntityModel<HallDto> updateHall(@PathVariable Long id, @RequestBody HallDto newHall) throws HallNotFoundException;
+    HallDTO updateHall(@PathVariable Long id, @RequestBody HallDTORequest newHall);
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteHall(@PathVariable Long id);

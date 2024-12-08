@@ -1,20 +1,21 @@
 package fr.hoenheimsports.trainingservice.services;
 
-import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import org.springframework.hateoas.EntityModel;
+import fr.hoenheimsports.trainingservice.dto.CoachDTO;
+import fr.hoenheimsports.trainingservice.dto.request.CoachDTORequest;
+import fr.hoenheimsports.trainingservice.models.Coach;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 
-import java.util.List;
-
 public interface CoachService {
-    EntityModel<CoachDto> createCoach(CoachDto coachDto);
+    CoachDTO createAndConvertToModel(CoachDTORequest coachDtoRequest);
 
-    PagedModel<?> getAllCoaches(int page, int size, List<String> sort);
+    Coach findOrCreateOrUpdate(CoachDTORequest coachDtoRequest);
 
-    EntityModel<CoachDto> getCoachById(Long id) throws CoachNotFoundException;
+    PagedModel<CoachDTO> getAllModels(Pageable pageable);
 
-    EntityModel<CoachDto> updateCoach(Long id, CoachDto coachDto) throws CoachNotFoundException;
+    CoachDTO getModelById(Long id);
 
-    void deleteCoach(Long id);
+    CoachDTO updateAndConvertToModel(Long id, CoachDTORequest coachDtoRequest);
+
+    void deleteById(Long id);
 }

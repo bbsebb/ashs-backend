@@ -1,20 +1,21 @@
 package fr.hoenheimsports.trainingservice.services;
 
-import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.HallDto;
-import org.springframework.hateoas.EntityModel;
+import fr.hoenheimsports.trainingservice.dto.HallDTO;
+import fr.hoenheimsports.trainingservice.dto.request.HallDTORequest;
+import fr.hoenheimsports.trainingservice.models.Hall;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 
-import java.util.List;
-
 public interface HallService {
-    EntityModel<HallDto> createHall(HallDto hallDto);
+    HallDTO createAndConvertToModel(HallDTORequest hallDtoRequest);
 
-    PagedModel<?> getAllHalls(int page, int size, List<String> sort);
+    Hall findOrCreateOrUpdate(HallDTORequest hallDtoRequest);
 
-    EntityModel<HallDto> getHallById(Long id) throws HallNotFoundException;
+    PagedModel<HallDTO> getAllModels(Pageable pageable);
 
-    EntityModel<HallDto> updateHall(Long id, HallDto hallDto) throws HallNotFoundException;
+    HallDTO getModelById(Long id);
 
-    void deleteHall(Long id);
+    HallDTO updateAndConvertToModel(Long id, HallDTORequest hallDtoRequest);
+
+    void deleteById(Long id);
 }

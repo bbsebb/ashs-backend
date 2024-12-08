@@ -1,14 +1,17 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
 import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.HallDto;
+import fr.hoenheimsports.trainingservice.dto.HallDTO;
+import fr.hoenheimsports.trainingservice.dto.request.HallDTORequest;
 import fr.hoenheimsports.trainingservice.services.HallServiceImpl;
-import org.springframework.hateoas.EntityModel;
+import fr.hoenheimsports.trainingservice.validators.OnCreate;
+import fr.hoenheimsports.trainingservice.validators.OnUpdate;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/halls",
@@ -23,35 +26,33 @@ public class HallControllerImpl implements HallController {
 
     @Override
     @GetMapping
-    public PagedModel<?> getAllHalls(@RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "20") int size,
-                                     @RequestParam(name = "sort", required = false) List<String> sort) {
+    public PagedModel<HallDTO> getAllHalls(@ParameterObject Pageable pageable) {
 
-        return hallService.getAllHalls(page, size, sort);
+        return hallService.getAllModels(pageable);
     }
 
     @Override
     @GetMapping("/{id}")
-    public EntityModel<HallDto> getHallById(@PathVariable Long id) throws HallNotFoundException {
-        return hallService.getHallById(id);
+    public HallDTO getHallById(@PathVariable Long id) throws HallNotFoundException {
+        return hallService.getModelById(id);
     }
 
     @Override
     @PostMapping
-    public EntityModel<HallDto> createHall(@RequestBody HallDto newHall) {
-        return hallService.createHall(newHall);
+    public HallDTO createHall(@Validated(OnCreate.class)  @RequestBody HallDTORequest newHall) {
+        return hallService.createAndConvertToModel(newHall);
     }
 
     @Override
     @PutMapping("/{id}")
-    public EntityModel<HallDto> updateHall(@PathVariable Long id, @RequestBody HallDto newHall) throws HallNotFoundException {
-        return hallService.updateHall(id, newHall);
+    public HallDTO updateHall(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody HallDTORequest newHall) throws HallNotFoundException {
+        return hallService.updateAndConvertToModel(id, newHall);
     }
 
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteHall(@PathVariable Long id) {
-        hallService.deleteHall(id);
+        hallService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

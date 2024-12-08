@@ -1,4 +1,4 @@
 package fr.hoenheimsports.trainingservice.Exception;
 
-public class DataNotFoundException extends Exception {
+public class DataNotFoundException extends RuntimeException {
 }

@@ -1,100 +1,161 @@
 package fr.hoenheimsports.trainingservice.services;
 
-import fr.hoenheimsports.trainingservice.Exception.DataNotFoundException;
+import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
+import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.Exception.TeamNotFoundException;
-import fr.hoenheimsports.trainingservice.assemblers.TeamModelAssembler;
-import fr.hoenheimsports.trainingservice.assemblers.TeamPagedModelAssembler;
-import fr.hoenheimsports.trainingservice.dto.TeamDto;
+import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
+import fr.hoenheimsports.trainingservice.assemblers.TeamAssembler;
+import fr.hoenheimsports.trainingservice.dto.TeamDTO;
+import fr.hoenheimsports.trainingservice.dto.request.CoachDTORequest;
+import fr.hoenheimsports.trainingservice.dto.request.TeamDTORequest;
+import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
 import fr.hoenheimsports.trainingservice.mappers.TeamMapper;
 import fr.hoenheimsports.trainingservice.models.Coach;
 import fr.hoenheimsports.trainingservice.models.Team;
 import fr.hoenheimsports.trainingservice.models.TrainingSession;
-import fr.hoenheimsports.trainingservice.repositories.CoachRepository;
 import fr.hoenheimsports.trainingservice.repositories.TeamRepository;
-import fr.hoenheimsports.trainingservice.repositories.TrainingSessionRepository;
-import org.springframework.data.domain.PageRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
-    private final CoachRepository coachRepository;
-    private final TrainingSessionRepository trainingSessionRepository;
-    private final TeamModelAssembler teamModelAssembler;
-    private final TeamPagedModelAssembler teamPagedModelAssembler;
+    private final TrainingSessionService trainingSessionService;
+    private final TeamAssembler teamAssembler;
     private final TeamMapper teamMapper;
-    private final SortUtil sortUtil;
+    private final CoachService coachService;
 
-    public TeamServiceImpl(TeamRepository teamRepository, CoachRepository coachRepository, TrainingSessionRepository trainingSessionRepository, TeamModelAssembler teamModelAssemblerImpl, TeamPagedModelAssembler teamPagedModelAssembler, TeamMapper teamMapper, SortUtil sortUtil) {
+    public TeamServiceImpl(TeamRepository teamRepository, TrainingSessionService trainingSessionService, TeamAssembler teamAssembler, TeamMapper teamMapper, CoachService coachService) {
         this.teamRepository = teamRepository;
-        this.coachRepository = coachRepository;
-        this.trainingSessionRepository = trainingSessionRepository;
-        this.teamModelAssembler = teamModelAssemblerImpl;
-        this.teamPagedModelAssembler = teamPagedModelAssembler;
+        this.trainingSessionService = trainingSessionService;
+        this.teamAssembler = teamAssembler;
         this.teamMapper = teamMapper;
-        this.sortUtil = sortUtil;
+        this.coachService = coachService;
     }
 
     @Override
-    public EntityModel<TeamDto> createTeam(TeamDto teamDto)   {
-        Team newTeam = this.teamMapper.toEntity(teamDto);
-        persistRelatedEntities(newTeam);
-        newTeam = this.teamRepository.save(newTeam);
-       return this.teamModelAssembler.toModel(this.teamMapper.toDto(newTeam));
+    public Team findOrCreateOrUpdate(TeamDTORequest teamDtoRequest) throws TeamNotFoundException, CoachNotFoundException, TrainingSessionNotFoundException, HallNotFoundException {
+        if(teamDtoRequest == null) {
+            throw new TeamNotFoundException();
+        }
+        Team team;
+        if(teamDtoRequest.id() != null) {
+            team = this.update(teamDtoRequest.id(), teamDtoRequest);
+        } else {
+            team =  this.create(teamDtoRequest);
+        }
+        return this.teamRepository.save(team);
     }
 
     @Override
-    public PagedModel<?> getAllTeams(int page, int size, List<String> sort) {
-        Pageable pageable = PageRequest.of(page, size, this.sortUtil.createSort(sort));
-        return teamPagedModelAssembler.toModel(teamRepository.findAll(pageable).map(teamMapper::toDto).map(teamModelAssembler::toModel));
+    public TeamDTO createAndConvertToModel(TeamDTORequest teamDtoRequest) throws TrainingSessionNotFoundException, CoachNotFoundException, HallNotFoundException {
+       return this.teamAssembler.toModel(this.create(teamDtoRequest));
+    }
+
+    private Team create(TeamDTORequest teamDtoRequest) throws TrainingSessionNotFoundException, CoachNotFoundException, HallNotFoundException {
+        Set<TrainingSession> trainingSessions = getPersistedTrainingSessions(teamDtoRequest);
+        teamDtoRequest.trainingSessions().clear();
+        Set<Coach> coaches = getPersistedCoaches(teamDtoRequest);
+        teamDtoRequest.coaches().clear();
+
+        Team newTeam = this.teamMapper.toEntity(teamDtoRequest);
+
+        //on ajoute celles déjà persistés.
+        trainingSessions.forEach(newTeam::addTrainingSession);
+
+        //on ajoute celles déjà persistés.
+        coaches.forEach(newTeam::addCoach);
+
+        return this.teamRepository.save(newTeam);
     }
 
     @Override
-    public EntityModel<TeamDto> getTeamById(Long id) throws TeamNotFoundException {
+    public PagedModel<TeamDTO> getAllModels(Pageable pageable) {
+        return teamAssembler.toPagedModel(teamRepository.findAll(pageable));
+    }
+
+    @Override
+    public TeamDTO getModelById(Long id) throws TeamNotFoundException {
         return teamRepository.findById(id)
-                .map(teamMapper::toDto)
-                .map(teamModelAssembler::toModel)
+                .map(teamAssembler::toModel)
                 .orElseThrow(TeamNotFoundException::new);
     }
 
     @Override
-    public EntityModel<TeamDto> updateTeam(Long id, TeamDto teamDto) throws TeamNotFoundException {
-        Team existingTeam = teamRepository.findById(id)
-                .orElseThrow(TeamNotFoundException::new);
-
-        persistRelatedEntities(existingTeam);
-
-        Team updatedTeam = teamMapper.partialUpdate(teamDto, existingTeam);
-        updatedTeam = teamRepository.save(updatedTeam);
-
-        return teamModelAssembler.toModel(teamMapper.toDto(updatedTeam));
+    @Transactional
+    public TeamDTO updateAndConvertToModel(Long id, TeamDTORequest teamDtoRequest) throws TeamNotFoundException, CoachNotFoundException, TrainingSessionNotFoundException, HallNotFoundException {
+        return teamAssembler.toModel(this.update(id, teamDtoRequest));
     }
 
-    private void persistRelatedEntities(Team existingTeam) {
-        if(existingTeam.getCoach() != null) {
-            Coach savedCoach = this.coachRepository.save(existingTeam.getCoach());
-            existingTeam.setCoach(savedCoach);
-        }
-        if(existingTeam.getTrainingSessions() != null) {
-            Set<TrainingSession> savedTrainingSessions = existingTeam.getTrainingSessions().stream()
-                    .filter(Objects::nonNull)
-                    .map(this.trainingSessionRepository::save)
-                    .collect(Collectors.toSet());
-            existingTeam.setTrainingSessions(savedTrainingSessions);
-        }
 
+    private Team update(Long id, TeamDTORequest teamDtoRequest) throws TeamNotFoundException, CoachNotFoundException, TrainingSessionNotFoundException, HallNotFoundException {
+        Team existingTeam = teamRepository.findById(id).orElseThrow(TeamNotFoundException::new);
+        Set<TrainingSession> trainingSessions = getPersistedTrainingSessions(teamDtoRequest);
+        Set<Coach> coaches = getPersistedCoaches(teamDtoRequest);
+        teamMapper.partialUpdate(teamDtoRequest,existingTeam);
+
+        //Je supprime les trainingSessions qui ne sont plus dans la liste
+        existingTeam.getTrainingSessions().stream()
+                .filter(ts -> trainingSessions.stream().noneMatch(newTs -> newTs.getId().equals(ts.getId())))
+                .forEach(existingTeam::removeTrainingSession);
+
+        // J'ajoute les nouvelles trainingSessions
+        trainingSessions.forEach(existingTeam::addTrainingSession);
+
+
+        // Je supprime les coaches qui ne sont plus dans la liste
+        existingTeam.getCoaches().stream().filter(coach -> coaches.stream()
+                .noneMatch(c -> c.getId().equals(coach.getId()))).forEach(existingTeam::removeCoach);
+        // J'ajoute les nouveaux coaches
+        coaches.forEach(existingTeam::addCoach);
+
+        return teamRepository.save(existingTeam);
     }
+
 
     @Override
-    public void deleteTeam(Long id) {
+    public void deleteById(Long id) {
         teamRepository.deleteById(id);
+    }
+
+    /**
+     * Crée ou met à jour ou trouve les coaches d'une équipe
+     *
+     * @param teamDtoRequest le dto de l'équipe
+     * @return la liste des coaches persistés
+     * @throws CoachNotFoundException si un coach n'existe pas dans la liste
+     */
+    private Set<Coach> getPersistedCoaches(TeamDTORequest teamDtoRequest) throws CoachNotFoundException {
+        Set<Coach> coaches = new HashSet<>();
+        if (teamDtoRequest.coaches() != null) {
+            for (CoachDTORequest coachDtoRequest : teamDtoRequest.coaches()) {
+                Coach newCoach = this.coachService.findOrCreateOrUpdate(coachDtoRequest);
+                coaches.add(newCoach);
+            }
+        }
+        return coaches;
+    }
+
+    /**
+     * Crée ou met à jour ou trouve les trainingSessions d'une équipe
+     * @param teamDtoRequest le dto de l'équipe
+     * @return la liste des trainingSessions persistés
+     * @throws TrainingSessionNotFoundException si un trainingSession n'existe pas dans la liste
+     * @throws HallNotFoundException si un hall n'existe pas dans la liste
+     */
+    private Set<TrainingSession> getPersistedTrainingSessions(TeamDTORequest teamDtoRequest) throws TrainingSessionNotFoundException, HallNotFoundException {
+        Set<TrainingSession> trainingSessions = new HashSet<>();
+        if (teamDtoRequest.trainingSessions() != null) {
+            for (TrainingSessionDTORequest trainingSessionDtoRequest : teamDtoRequest.trainingSessions()) {
+                TrainingSession session = this.trainingSessionService.findOrCreateOrUpdate(trainingSessionDtoRequest);
+                trainingSessions.add(session);
+            }
+        }
+        return trainingSessions;
     }
 }

@@ -1,28 +1,24 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
-import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.CoachDto;
-import org.springframework.hateoas.EntityModel;
+import fr.hoenheimsports.trainingservice.dto.CoachDTO;
+import fr.hoenheimsports.trainingservice.dto.request.CoachDTORequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 public interface CoachController {
     @GetMapping
-    PagedModel<?> getAllCoaches(@RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "20") int size,
-                                                    @RequestParam(name = "sort", required = false) List<String> sort);
+    PagedModel<CoachDTO> getAllCoaches(Pageable pageable);
 
     @GetMapping("/{id}")
-    EntityModel<CoachDto> getCoachById(@PathVariable Long id) throws CoachNotFoundException;
+    CoachDTO getCoachById(@PathVariable Long id);
 
     @PostMapping
-    EntityModel<CoachDto> createCoach(@RequestBody CoachDto newCoach);
+    CoachDTO createCoach(@RequestBody CoachDTORequest newCoach);
 
     @PutMapping("/{id}")
-    EntityModel<CoachDto> updateCoach(@PathVariable Long id, @RequestBody CoachDto newCoach) throws CoachNotFoundException;
+    CoachDTO updateCoach(@PathVariable Long id, @RequestBody CoachDTORequest newCoach);
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteCoach(@PathVariable Long id) ;

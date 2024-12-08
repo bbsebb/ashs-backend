@@ -1,84 +1,95 @@
 package fr.hoenheimsports.trainingservice.services;
 
-import fr.hoenheimsports.trainingservice.Exception.DataNotFoundException;
-import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
-import fr.hoenheimsports.trainingservice.assemblers.TrainingSessionModelAssembler;
-import fr.hoenheimsports.trainingservice.assemblers.TrainingSessionPagedModelAssembler;
-import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
+import fr.hoenheimsports.trainingservice.assemblers.TrainingSessionAssembler;
+import fr.hoenheimsports.trainingservice.dto.TrainingSessionDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
 import fr.hoenheimsports.trainingservice.mappers.TrainingSessionMapper;
 import fr.hoenheimsports.trainingservice.models.Hall;
 import fr.hoenheimsports.trainingservice.models.TrainingSession;
-import fr.hoenheimsports.trainingservice.repositories.HallRepository;
 import fr.hoenheimsports.trainingservice.repositories.TrainingSessionRepository;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TrainingSessionServiceImpl implements TrainingSessionService {
     private final TrainingSessionRepository trainingSessionRepository;
-    private final HallRepository hallRepository;
-    private final TrainingSessionModelAssembler trainingSessionModelAssembler;
-    private final TrainingSessionPagedModelAssembler trainingSessionPagedModelAssembler;
+    private final TrainingSessionAssembler trainingSessionAssembler;
     private final TrainingSessionMapper trainingSessionMapper;
-    private final SortUtil sortUtil;
+    private final HallServiceImpl hallServiceImpl;
 
-    public TrainingSessionServiceImpl(TrainingSessionRepository trainingSessionRepository, HallRepository hallRepository, TrainingSessionModelAssembler trainingSessionModelAssemblerImpl, TrainingSessionPagedModelAssembler trainingSessionPagedModelAssembler, TrainingSessionMapper trainingSessionMapper, SortUtil sortUtil) {
+    public TrainingSessionServiceImpl(TrainingSessionRepository trainingSessionRepository, TrainingSessionAssembler trainingSessionAssembler, TrainingSessionMapper trainingSessionMapper, HallServiceImpl hallServiceImpl) {
         this.trainingSessionRepository = trainingSessionRepository;
-        this.hallRepository = hallRepository;
-        this.trainingSessionModelAssembler = trainingSessionModelAssemblerImpl;
-        this.trainingSessionPagedModelAssembler = trainingSessionPagedModelAssembler;
+        this.trainingSessionAssembler = trainingSessionAssembler;
+
         this.trainingSessionMapper = trainingSessionMapper;
-        this.sortUtil = sortUtil;
+        this.hallServiceImpl = hallServiceImpl;
     }
 
     @Override
-    public EntityModel<TrainingSessionDto> createTrainingSession(TrainingSessionDto trainingSessionDto)  {
-        TrainingSession newTrainingSession = this.trainingSessionMapper.toEntity(trainingSessionDto);
-        persistRelatedEntities(newTrainingSession);
+    public TrainingSessionDTO createAndConvertToModel(TrainingSessionDTORequest trainingSessionDtoRequest) {
+        return this.trainingSessionAssembler.toModel(this.create(trainingSessionDtoRequest));
+    }
+
+    private TrainingSession create(TrainingSessionDTORequest trainingSessionDtoRequest) {
+        Hall hall = this.hallServiceImpl.findOrCreateOrUpdate(trainingSessionDtoRequest.hall());
+        TrainingSession newTrainingSession = this.trainingSessionMapper.toEntity(trainingSessionDtoRequest);
+        hall.addTrainingSession(newTrainingSession);
         newTrainingSession = this.trainingSessionRepository.save(newTrainingSession);
-        return this.trainingSessionModelAssembler.toModel(this.trainingSessionMapper.toDto(newTrainingSession));
+        return newTrainingSession;
     }
 
-    private void persistRelatedEntities(TrainingSession newTrainingSession) {
-        if(newTrainingSession.getHall() != null) {
-            Hall savedHall = this.hallRepository.save(newTrainingSession.getHall());
-            newTrainingSession.setHall(savedHall);
+    @Override
+    public TrainingSession findOrCreateOrUpdate(TrainingSessionDTORequest trainingSessionDtoRequest) {
+        if(trainingSessionDtoRequest == null) {
+            throw new TrainingSessionNotFoundException();
         }
+        TrainingSession trainingSession;
+        if(trainingSessionDtoRequest.id() != null) {
+            trainingSession = this.update(trainingSessionDtoRequest.id(), trainingSessionDtoRequest);
+        } else {
+            trainingSession =  this.create(trainingSessionDtoRequest);
+        }
+        return trainingSession;
     }
 
     @Override
-    public PagedModel<?> getAllTrainingSessions(int page, int size, List<String> sort) {
-        Pageable pageable = PageRequest.of(page, size, this.sortUtil.createSort(sort));
-        return trainingSessionPagedModelAssembler.toModel(trainingSessionRepository.findAll(pageable).map(trainingSessionMapper::toDto).map(trainingSessionModelAssembler::toModel));
+    public PagedModel<TrainingSessionDTO> getAllModels(Pageable pageable) {
+        return trainingSessionAssembler.toPagedModel(trainingSessionRepository.findAll(pageable));
     }
 
     @Override
-    public EntityModel<TrainingSessionDto> getTrainingSessionById(Long id) throws TrainingSessionNotFoundException {
+    public Page<TrainingSession> getAll(Pageable pageable) {
+        return trainingSessionRepository.findAll(pageable);
+    }
+
+
+    @Override
+    public TrainingSessionDTO getModelById(Long id){
         return trainingSessionRepository.findById(id)
-                .map(trainingSessionMapper::toDto)
-                .map(trainingSessionModelAssembler::toModel)
+                .map(trainingSessionAssembler::toModel)
                 .orElseThrow(TrainingSessionNotFoundException::new);
     }
 
     @Override
-    public EntityModel<TrainingSessionDto> updateTrainingSession(Long id, TrainingSessionDto trainingSessionDto) throws TrainingSessionNotFoundException {
+    public TrainingSessionDTO updateAndConvertToModel(Long id, TrainingSessionDTORequest trainingSessionDtoRequest) {
+        return trainingSessionAssembler.toModel(this.update(trainingSessionDtoRequest.id(), trainingSessionDtoRequest));
+    }
+
+    private TrainingSession update(Long id, TrainingSessionDTORequest trainingSessionDtoRequest)   {
+        Hall hall = this.hallServiceImpl.findOrCreateOrUpdate(trainingSessionDtoRequest.hall());
         TrainingSession existingTrainingSession = trainingSessionRepository.findById(id)
                 .orElseThrow(TrainingSessionNotFoundException::new);
-        persistRelatedEntities(existingTrainingSession);
-        TrainingSession updatedTrainingSession = trainingSessionMapper.partialUpdate(trainingSessionDto, existingTrainingSession);
+        TrainingSession updatedTrainingSession = trainingSessionMapper.partialUpdate(trainingSessionDtoRequest, existingTrainingSession);
+        hall.addTrainingSession(updatedTrainingSession);
         updatedTrainingSession = trainingSessionRepository.save(updatedTrainingSession);
-
-        return trainingSessionModelAssembler.toModel(trainingSessionMapper.toDto(updatedTrainingSession));
+        return updatedTrainingSession;
     }
 
     @Override
-    public void deleteTrainingSession(Long id) {
+    public void deleteById(Long id) {
         trainingSessionRepository.deleteById(id);
     }
 }

@@ -3,12 +3,14 @@ spring:
     name: training-service
   config:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
+  hateoas:
+    use-hal-as-default-json-media-type: true
 server:
   port: 8084
 springdoc:
   default-produces-media-type: application/prs.hal-forms+json
 logging:
   level:
-    org.springframework.web: DEBUG
-    org.springframework.http.converter.json: DEBUG
-    com.fasterxml.jackson.databind: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.tool.hbm2ddl: DEBUG
+

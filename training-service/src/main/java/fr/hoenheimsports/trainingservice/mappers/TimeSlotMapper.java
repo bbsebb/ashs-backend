@@ -1,14 +1,15 @@
 package fr.hoenheimsports.trainingservice.mappers;
 
-import fr.hoenheimsports.trainingservice.dto.TimeSlotDto;
+import fr.hoenheimsports.trainingservice.dto.TimeSlotDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TimeSlotDTORequest;
+
 import fr.hoenheimsports.trainingservice.models.TimeSlot;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TimeSlotMapper {
 
-    TimeSlot toEntity(TimeSlotDto timeSlotDto);
+    TimeSlot toEntity(TimeSlotDTORequest timeSlotDtoRequest);
 
-    TimeSlotDto toDto(TimeSlot timeSlot);
-
+    TimeSlotDTO toDto(TimeSlot timeSlot);
 }
