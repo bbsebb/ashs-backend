@@ -7,10 +7,3 @@ spring:
     use-hal-as-default-json-media-type: true
 server:
   port: 8084
-springdoc:
-  default-produces-media-type: application/prs.hal-forms+json
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.tool.hbm2ddl: DEBUG
-
