@@ -1,108 +1,73 @@
 package fr.hoenheimsports.trainingservice.models;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.Hibernate;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Hall {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(length = 100, nullable = false)
     private String name;
+
     @Embedded
     private Address address;
 
-    private Hall(Builder builder) {
-        setId(builder.id);
-        setName(builder.name);
-        setAddress(builder.address);
+    @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TrainingSession> trainingSessions = new HashSet<>();
+
+    public Set<TrainingSession> getTrainingSessions() {
+        return new HashSet<>(trainingSessions);
     }
 
-    public Hall() {
+    // Méthode d'ajout pour maintenir la relation bidirectionnelle
+    public void addTrainingSession(TrainingSession trainingSession) {
+        if(trainingSessions.add(trainingSession)) {
+            trainingSession.setHall(this);
+        } // Associe la session au hall
     }
 
-    public Long getId() {
-        return id;
+    // Méthode de suppression pour maintenir la relation bidirectionnelle
+    public void removeTrainingSession(TrainingSession trainingSession) {
+        if(trainingSessions.remove(trainingSession)) {
+            trainingSession.setHall(null);
+        } // Dissocie la session du hall
     }
 
-    public void setId(Long id) {
-        this.id = id;
+
+    @Override
+    public String toString() {
+        return "Hall{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", address=" + address +
+                ", trainingSessions=" + trainingSessions.stream().map(TrainingSession::getId).map(String::valueOf).collect(Collectors.joining(",")) +
+                '}';
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Hall user = (Hall) o;
+        return id != null && id.equals(user.id);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode(); // ou Objects.hash(id)
     }
 
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * {@code Halle} builder static inner class.
-     */
-    public static final class Builder {
-        private Long id;
-        private String name;
-        private Address address;
-
-        private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * Sets the {@code id} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param id the {@code id} to set
-         * @return a reference to this Builder
-         */
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        /**
-         * Sets the {@code name} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param name the {@code name} to set
-         * @return a reference to this Builder
-         */
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        /**
-         * Sets the {@code address} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param address the {@code address} to set
-         * @return a reference to this Builder
-         */
-        public Builder address(Address address) {
-            this.address = address;
-            return this;
-        }
-
-        /**
-         * Returns a {@code Halle} built from the parameters previously set.
-         *
-         * @return a {@code Halle} built with parameters of this {@code Halle.Builder}
-         */
-        public Hall build() {
-            return new Hall(this);
-        }
-    }
 }

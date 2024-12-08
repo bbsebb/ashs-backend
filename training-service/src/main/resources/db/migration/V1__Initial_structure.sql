@@ -1,3 +1,4 @@
+
 -- Table: coach
 CREATE TABLE public.coach (
                               id BIGSERIAL PRIMARY KEY,
@@ -23,10 +24,8 @@ CREATE TABLE public.team (
                              category smallint,
                              gender smallint,
                              team_number integer NOT NULL,
-                             coach_id bigint,
                              CONSTRAINT team_category_check CHECK (((category >= 0) AND (category <= 5))),
-                             CONSTRAINT team_gender_check CHECK (((gender >= 0) AND (gender <= 2))),
-                             FOREIGN KEY (coach_id) REFERENCES public.coach(id)
+                             CONSTRAINT team_gender_check CHECK (((gender >= 0) AND (gender <= 2)))
 );
 
 -- Table: training_session
@@ -36,16 +35,18 @@ CREATE TABLE public.training_session (
                                          end_time time(6) without time zone,
                                          start_time time(6) without time zone,
                                          hall_id bigint,
+                                         team_id bigint,
                                          CONSTRAINT training_session_day_of_week_check CHECK (((day_of_week >= 0) AND (day_of_week <= 6))),
-                                         FOREIGN KEY (hall_id) REFERENCES public.hall(id)
+                                         FOREIGN KEY (hall_id) REFERENCES public.hall(id) ON DELETE CASCADE,
+                                         FOREIGN KEY (team_id) REFERENCES public.team(id) ON DELETE CASCADE
 );
 
--- Table: team_training_session
-CREATE TABLE public.team_training_session (
-                                              team_id bigint NOT NULL,
-                                              training_session_id bigint NOT NULL,
-                                              PRIMARY KEY (team_id, training_session_id),
-                                              UNIQUE (training_session_id),
-                                              FOREIGN KEY (team_id) REFERENCES public.team(id),
-                                              FOREIGN KEY (training_session_id) REFERENCES public.training_session(id)
+
+-- Table: coach_team
+CREATE TABLE public.coach_team (
+                                   coach_id bigint NOT NULL,
+                                   team_id bigint NOT NULL,
+                                   PRIMARY KEY (coach_id, team_id),
+                                   FOREIGN KEY (coach_id) REFERENCES public.coach(id),
+                                   FOREIGN KEY (team_id) REFERENCES public.team(id)
 );

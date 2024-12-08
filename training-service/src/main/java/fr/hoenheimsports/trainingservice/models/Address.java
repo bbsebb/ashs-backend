@@ -1,14 +1,19 @@
 package fr.hoenheimsports.trainingservice.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 
 @Embeddable
 public class Address {
+    @Column(length = 100, nullable = false)
     private String street;
+    @Column(length = 50, nullable = false)
     private String city;
+    @Column(length = 10, nullable = false)
     private String postalCode;
+    @Column(length = 50, nullable = false)
     private String country;
 
     public Address() {

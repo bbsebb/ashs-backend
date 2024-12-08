@@ -1,28 +1,24 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
-import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
+import fr.hoenheimsports.trainingservice.dto.TrainingSessionDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 public interface TrainingSessionController {
     @GetMapping
-    PagedModel<TrainingSessionModel> getAllTrainingSessions(@RequestParam(defaultValue = "0") int page,
-                                                            @RequestParam(defaultValue = "20") int size,
-                                                            @RequestParam(name = "sort", required = false) List<String> sort);
+    PagedModel<?> getAllTrainingSessions(Pageable pageable);
 
     @GetMapping("/{id}")
-    TrainingSessionModel getTrainingSessionById(@PathVariable Long id) throws TrainingSessionNotFoundException;
+    TrainingSessionDTO getTrainingSessionById(@PathVariable Long id);
 
     @PostMapping
-    TrainingSessionModel createTrainingSession(@RequestBody TrainingSessionDto newTrainingSession);
+    TrainingSessionDTO createTrainingSession(@RequestBody TrainingSessionDTORequest newTrainingSession);
 
     @PutMapping("/{id}")
-    TrainingSessionModel updateTrainingSession(@PathVariable Long id, @RequestBody TrainingSessionDto newTrainingSession) throws TrainingSessionNotFoundException;
+    TrainingSessionDTO updateTrainingSession(@PathVariable Long id, @RequestBody TrainingSessionDTORequest newTrainingSession);
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteTrainingSession(@PathVariable Long id);

@@ -1,20 +1,25 @@
 package fr.hoenheimsports.trainingservice.services;
 
-import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.TrainingSessionDto;
-import fr.hoenheimsports.trainingservice.ressources.TrainingSessionModel;
+import fr.hoenheimsports.trainingservice.dto.TrainingSessionDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
+import fr.hoenheimsports.trainingservice.models.TrainingSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 
-import java.util.List;
-
 public interface TrainingSessionService {
-    TrainingSessionModel createTrainingSession(TrainingSessionDto trainingSessionDto);
+    TrainingSessionDTO createAndConvertToModel(TrainingSessionDTORequest trainingSessionDtoRequest);
 
-    PagedModel<TrainingSessionModel> getAllTrainingSessions(int page, int size, List<String> sort);
+    TrainingSession findOrCreateOrUpdate(TrainingSessionDTORequest trainingSessionDtoRequest);
 
-    TrainingSessionModel getTrainingSessionById(Long id) throws TrainingSessionNotFoundException;
 
-    TrainingSessionModel updateTrainingSession(Long id, TrainingSessionDto trainingSessionDto) throws TrainingSessionNotFoundException;
+    PagedModel<TrainingSessionDTO> getAllModels(Pageable pageable);
 
-    void deleteTrainingSession(Long id);
+    Page<TrainingSession> getAll(Pageable pageable);
+
+    TrainingSessionDTO getModelById(Long id);
+
+    TrainingSessionDTO updateAndConvertToModel(Long id, TrainingSessionDTORequest trainingSessionDtoRequest);
+
+    void deleteById(Long id);
 }

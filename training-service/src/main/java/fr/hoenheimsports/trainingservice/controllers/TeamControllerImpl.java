@@ -1,14 +1,20 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
+import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
+import fr.hoenheimsports.trainingservice.Exception.HallNotFoundException;
 import fr.hoenheimsports.trainingservice.Exception.TeamNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.TeamDto;
-import fr.hoenheimsports.trainingservice.ressources.TeamModel;
+import fr.hoenheimsports.trainingservice.Exception.TrainingSessionNotFoundException;
+import fr.hoenheimsports.trainingservice.dto.TeamDTO;
+import fr.hoenheimsports.trainingservice.dto.request.TeamDTORequest;
 import fr.hoenheimsports.trainingservice.services.TeamServiceImpl;
+import fr.hoenheimsports.trainingservice.validators.OnCreate;
+import fr.hoenheimsports.trainingservice.validators.OnUpdate;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/teams",
@@ -22,35 +28,33 @@ public class TeamControllerImpl implements TeamController {
 
     @Override
     @GetMapping
-    public PagedModel<TeamModel> getAllTeams(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(name = "sort", required = false) List<String> sort) {
+    public PagedModel<TeamDTO> getAllTeams(@ParameterObject Pageable pageable) {
 
-        return teamService.getAllTeams(page, size, sort);
+        return teamService.getAllModels(pageable);
     }
 
     @Override
     @GetMapping("/{id}")
-    public TeamModel getTeamById(@PathVariable Long id) throws TeamNotFoundException {
-        return teamService.getTeamById(id);
+    public TeamDTO getTeamById(@PathVariable Long id) throws TeamNotFoundException {
+        return teamService.getModelById(id);
     }
 
     @Override
     @PostMapping
-    public TeamModel createTeam(@RequestBody TeamDto newTeam) {
-        return teamService.createTeam(newTeam);
+    public TeamDTO createTeam(@Validated(OnCreate.class) @RequestBody TeamDTORequest newTeam) throws TrainingSessionNotFoundException, CoachNotFoundException, HallNotFoundException {
+        return teamService.createAndConvertToModel(newTeam);
     }
 
     @Override
     @PutMapping("/{id}")
-    public TeamModel updateTeam(@PathVariable Long id, @RequestBody TeamDto newTeam) throws TeamNotFoundException {
-        return teamService.updateTeam(id, newTeam);
+    public TeamDTO updateTeam(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody TeamDTORequest newTeam) throws TeamNotFoundException, CoachNotFoundException, TrainingSessionNotFoundException, HallNotFoundException {
+        return teamService.updateAndConvertToModel(id, newTeam);
     }
 
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTeam(@PathVariable Long id) {
-        teamService.deleteTeam(id);
+        teamService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,15 +1,17 @@
 package fr.hoenheimsports.trainingservice.controllers;
 
-import fr.hoenheimsports.trainingservice.Exception.CoachNotFoundException;
-import fr.hoenheimsports.trainingservice.dto.CoachDto;
+import fr.hoenheimsports.trainingservice.dto.CoachDTO;
+import fr.hoenheimsports.trainingservice.dto.request.CoachDTORequest;
 
-import fr.hoenheimsports.trainingservice.ressources.CoachModel;
 import fr.hoenheimsports.trainingservice.services.CoachService;
+import fr.hoenheimsports.trainingservice.validators.OnCreate;
+import fr.hoenheimsports.trainingservice.validators.OnUpdate;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/coaches",
@@ -24,36 +26,32 @@ public class CoachControllerImpl implements CoachController {
 
     @Override
     @GetMapping
-    public PagedModel<CoachModel> getAllCoaches(@RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "20") int size,
-                                                @RequestParam(name = "sort", required = false) List<String> sort) {
-
-        return coachService.getAllCoaches(page, size, sort);
+    public PagedModel<CoachDTO> getAllCoaches(@ParameterObject Pageable pageable) {
+        return coachService.getAllModels(pageable);
     }
-
 
     @Override
     @GetMapping("/{id}")
-    public CoachModel getCoachById(@PathVariable Long id) throws CoachNotFoundException {
-        return coachService.getCoachById(id);
+    public CoachDTO getCoachById(@PathVariable Long id) {
+        return coachService.getModelById(id);
     }
 
     @Override
     @PostMapping
-    public CoachModel createCoach(@RequestBody CoachDto newCoach) {
-        return coachService.createCoach(newCoach);
+    public CoachDTO createCoach(@Validated(OnCreate.class) @RequestBody CoachDTORequest newCoach) {
+        return coachService.createAndConvertToModel(newCoach);
     }
 
     @Override
     @PutMapping("/{id}")
-    public CoachModel updateCoach(@PathVariable Long id, @RequestBody CoachDto newCoach) throws CoachNotFoundException {
-        return coachService.updateCoach(id, newCoach);
+    public CoachDTO updateCoach(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody CoachDTORequest newCoach) {
+        return coachService.updateAndConvertToModel(id, newCoach);
     }
 
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCoach(@PathVariable Long id) {
-        coachService.deleteCoach(id);
+        coachService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
