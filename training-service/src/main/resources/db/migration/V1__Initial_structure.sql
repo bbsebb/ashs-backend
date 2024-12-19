@@ -1,52 +1,75 @@
+-- Séquences
+CREATE SEQUENCE public.coach_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
--- Table: coach
+CREATE SEQUENCE public.hall_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.team_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.training_session_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+-- Tables avec contraintes
 CREATE TABLE public.coach (
-                              id BIGSERIAL PRIMARY KEY,
-                              email character varying(255),
-                              name character varying(255),
-                              phone character varying(255),
-                              surname character varying(255)
+                              id BIGINT NOT NULL DEFAULT nextval('public.coach_seq'),
+                              phone VARCHAR(15),
+                              email VARCHAR(100) UNIQUE,
+                              name VARCHAR(100),
+                              surname VARCHAR(100),
+                              PRIMARY KEY (id)
 );
 
--- Table: hall
 CREATE TABLE public.hall (
-                             id BIGSERIAL PRIMARY KEY,
-                             city character varying(255),
-                             country character varying(255),
-                             name character varying(255),
-                             postal_code character varying(255),
-                             street character varying(255)
+                             id BIGINT NOT NULL DEFAULT nextval('public.hall_seq'),
+                             postal_code VARCHAR(10) NOT NULL,
+                             city VARCHAR(50) NOT NULL,
+                             country VARCHAR(50) NOT NULL,
+                             name VARCHAR(100) NOT NULL,
+                             street VARCHAR(100) NOT NULL,
+                             PRIMARY KEY (id)
 );
 
--- Table: team
 CREATE TABLE public.team (
-                             id BIGSERIAL PRIMARY KEY,
-                             category smallint,
-                             gender smallint,
-                             team_number integer NOT NULL,
-                             CONSTRAINT team_category_check CHECK (((category >= 0) AND (category <= 5))),
-                             CONSTRAINT team_gender_check CHECK (((gender >= 0) AND (gender <= 2)))
+                             id BIGINT NOT NULL DEFAULT nextval('public.team_seq'),
+                             category SMALLINT NOT NULL CHECK (category BETWEEN 0 AND 5),
+                             gender SMALLINT NOT NULL CHECK (gender BETWEEN 0 AND 2),
+                             team_number INT NOT NULL CHECK (team_number > 0),
+                             CONSTRAINT unique_team UNIQUE (gender, category, team_number),
+                             PRIMARY KEY (id)
 );
 
--- Table: training_session
+CREATE TABLE public.team_coaches (
+                                     coaches_id BIGINT NOT NULL,
+                                     teams_id BIGINT NOT NULL,
+                                     PRIMARY KEY (coaches_id, teams_id),
+                                     CONSTRAINT fk_team FOREIGN KEY (teams_id) REFERENCES public.team(id) ON DELETE CASCADE,
+                                     CONSTRAINT fk_coach FOREIGN KEY (coaches_id) REFERENCES public.coach(id) ON DELETE CASCADE
+);
+
 CREATE TABLE public.training_session (
-                                         id BIGSERIAL PRIMARY KEY,
-                                         day_of_week smallint,
-                                         end_time time(6) without time zone,
-                                         start_time time(6) without time zone,
-                                         hall_id bigint,
-                                         team_id bigint,
-                                         CONSTRAINT training_session_day_of_week_check CHECK (((day_of_week >= 0) AND (day_of_week <= 6))),
-                                         FOREIGN KEY (hall_id) REFERENCES public.hall(id) ON DELETE CASCADE,
-                                         FOREIGN KEY (team_id) REFERENCES public.team(id) ON DELETE CASCADE
-);
-
-
--- Table: coach_team
-CREATE TABLE public.coach_team (
-                                   coach_id bigint NOT NULL,
-                                   team_id bigint NOT NULL,
-                                   PRIMARY KEY (coach_id, team_id),
-                                   FOREIGN KEY (coach_id) REFERENCES public.coach(id),
-                                   FOREIGN KEY (team_id) REFERENCES public.team(id)
+                                         id BIGINT NOT NULL DEFAULT nextval('public.training_session_seq'),
+                                         day_of_week SMALLINT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+                                         start_time TIME NOT NULL,
+                                         end_time TIME NOT NULL,
+                                         hall_id BIGINT REFERENCES public.hall(id) ON DELETE SET NULL,
+                                         team_id BIGINT REFERENCES public.team(id) ON DELETE CASCADE,
+                                         PRIMARY KEY (id)
 );

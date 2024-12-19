@@ -16,7 +16,7 @@ import java.util.Objects;
 @ToString
 public class TrainingSession {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Embedded

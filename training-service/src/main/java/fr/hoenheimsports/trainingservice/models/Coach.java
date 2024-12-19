@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class Coach {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column(length = 100)
     private String name;
