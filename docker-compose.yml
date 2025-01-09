@@ -1,0 +1,174 @@
+services:
+  discovery-service:
+    image: bbsebb/backend-discovery-service:1.0
+    container_name: discovery-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.gateway-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    expose:
+      - "8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      retries: 4
+  config-service:
+    image: bbsebb/backend-config-service:1.0
+    container_name: config-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.gateway-service
+    expose:
+      - "8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      retries: 4
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+  gateway-service:
+    image: bbsebb/backend-gateway-service:1.0
+    container_name: gateway-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.gateway-service
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      retries: 4
+    depends_on:
+      config-service:
+        condition: service_healthy
+  contact-service:
+    image: bbsebb/backend-contact-service:1.0
+    container_name: contact-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.contact-service
+    expose:
+      - "8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      retries: 4
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+  instagram-service:
+    image: bbsebb/backend-instagram-service:1.0
+    container_name: instagram-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.instagram-service
+    expose:
+      - "8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+      postgres-instagram:
+        condition: service_healthy
+  # Services training
+  training-service:
+    image: bbsebb/backend-training-service:1.0
+    container_name: training-service
+    restart: unless-stopped
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.training-service
+    expose:
+      - "8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:8888
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+      postgres-training:
+        condition: service_healthy
+  # Postgres db for instagram service
+  postgres-instagram:
+    image: postgres:16.2
+    container_name: postgres-instagram
+    environment:
+      POSTGRES_DB: instagram_db
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    expose:
+      - "5432"
+    volumes:
+      - instagram_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sa -d instagram_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # Postgres db for instagram service
+  postgres-training:
+    image: postgres:16.2
+    container_name: postgres-training
+    environment:
+      POSTGRES_DB: training_db
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    expose:
+      - "5432"
+    volumes:
+      - training_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sa -d training_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  instagram_data:
+  training_data:
