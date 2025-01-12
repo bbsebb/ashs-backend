@@ -53,7 +53,7 @@ public class CoachAssemblerImpl implements CoachAssembler {
 
     public void addLinks(CollectionModel<CoachDTO> resources) {
         resources.add(linkTo(methodOn(CoachControllerImpl.class).getAllCoaches(Pageable.unpaged())).withRel("coaches").expand());
-        if(!this.userSecurityService.hasRole("ADMIN")) {
+        if(this.userSecurityService.hasRole("ADMIN")) {
             resources.add(linkTo(methodOn(CoachControllerImpl.class).getAllCoaches(Pageable.unpaged())).withRel("coaches").expand()
                     .andAffordance(afford(methodOn(CoachControllerImpl.class).createCoach(new CoachDTORequest(1L, "email", "name", "phone", "surname")))) // default name
                     .andAffordance(afford(methodOn(CoachControllerImpl.class).createCoach(new CoachDTORequest(1L, "email", "name", "phone", "surname")))));

@@ -67,7 +67,6 @@ public class TeamAssemblerImpl implements TeamAssembler {
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDTORequest(1L, Gender.N, Category.SENIOR,1,Set.of(), Set.of()))))
             );
         }
-
     }
 
     private void addLinks(TeamDTO resource) {
@@ -79,6 +78,5 @@ public class TeamAssemblerImpl implements TeamAssembler {
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).updateTeam(resource.getId(), null)))
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).deleteTeam(resource.getId()))));
         }
-
     }
 }
