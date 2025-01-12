@@ -8,6 +8,7 @@ import fr.hoenheimsports.trainingservice.dto.request.TimeSlotDTORequest;
 import fr.hoenheimsports.trainingservice.dto.request.TrainingSessionDTORequest;
 import fr.hoenheimsports.trainingservice.mappers.TrainingSessionMapper;
 import fr.hoenheimsports.trainingservice.models.TrainingSession;
+import fr.hoenheimsports.trainingservice.services.UserSecurityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -26,10 +27,12 @@ public class TrainingSessionAssemblerImpl implements TrainingSessionAssembler {
 
     private final TrainingSessionMapper trainingSessionMapper;
     private final PagedResourcesAssembler<TrainingSession> pagedResourcesAssembler;
+    private final UserSecurityService userSecurityService;
 
-    public TrainingSessionAssemblerImpl(TrainingSessionMapper trainingSessionMapper, PagedResourcesAssembler<TrainingSession> pagedResourcesAssembler) {
+    public TrainingSessionAssemblerImpl(TrainingSessionMapper trainingSessionMapper, PagedResourcesAssembler<TrainingSession> pagedResourcesAssembler, UserSecurityService userSecurityService) {
         this.trainingSessionMapper = trainingSessionMapper;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
+        this.userSecurityService = userSecurityService;
     }
 
     @NonNull
@@ -56,20 +59,27 @@ public class TrainingSessionAssemblerImpl implements TrainingSessionAssembler {
     }
 
     public void addLinks(TrainingSessionDTO resource) {
-        resource.add(
-                linkTo(methodOn(TrainingSessionControllerImpl.class).getTrainingSessionById(resource.getId())).withSelfRel()
-                        .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).updateTrainingSession(resource.getId(), null))) //skip default
-                        .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).updateTrainingSession(resource.getId(), null)))
-                        .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).deleteTrainingSession(resource.getId())))
-        );
+        resource.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getTrainingSessionById(resource.getId())).withSelfRel());
         resource.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withRel("trainingSessions").expand());
+        if(this.userSecurityService.hasRole("ADMIN")) {
+            resource.add(
+                    linkTo(methodOn(TrainingSessionControllerImpl.class).getTrainingSessionById(resource.getId())).withSelfRel()
+                            .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).updateTrainingSession(resource.getId(), null))) //skip default
+                            .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).updateTrainingSession(resource.getId(), null)))
+                            .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).deleteTrainingSession(resource.getId())))
+            );
+        }
     }
 
     public void addLinks(CollectionModel<TrainingSessionDTO> resources) {
-        var trainingSessionDtoRequest = new TrainingSessionDTORequest(1L,new TimeSlotDTORequest(DayOfWeek.MONDAY, LocalTime.now(), LocalTime.now()),new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")));
-        resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel()
-                .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))) // skip default name
-                .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))));
+        resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel());
+        if(this.userSecurityService.hasRole("ADMIN")) {
+            var trainingSessionDtoRequest = new TrainingSessionDTORequest(1L,new TimeSlotDTORequest(DayOfWeek.MONDAY, LocalTime.now(), LocalTime.now()),new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")));
+            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel()
+                    .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))) // skip default name
+                    .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))));
+        }
+
 
     }
 

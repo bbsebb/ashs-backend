@@ -10,6 +10,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,18 +40,21 @@ public class HallControllerImpl implements HallController {
 
     @Override
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public HallDTO createHall(@Validated(OnCreate.class)  @RequestBody HallDTORequest newHall) {
         return hallService.createAndConvertToModel(newHall);
     }
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public HallDTO updateHall(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody HallDTORequest newHall) throws HallNotFoundException {
         return hallService.updateAndConvertToModel(id, newHall);
     }
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteHall(@PathVariable Long id) {
         hallService.deleteById(id);
         return ResponseEntity.noContent().build();

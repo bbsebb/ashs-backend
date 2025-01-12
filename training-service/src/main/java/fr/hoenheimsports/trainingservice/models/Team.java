@@ -30,7 +30,7 @@ public class Team {
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private Category category;
-    @Column(nullable = false, columnDefinition = "int CHECK (teamNumber > 0)")
+    @Column(nullable = false, columnDefinition = "int CHECK (team_number > 0)")
     private int teamNumber;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

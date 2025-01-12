@@ -9,6 +9,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,18 +38,21 @@ public class TrainingSessionControllerImpl implements TrainingSessionController 
 
     @Override
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public TrainingSessionDTO createTrainingSession(@Validated(OnCreate.class)  @RequestBody TrainingSessionDTORequest newTrainingSession) {
         return trainingSessionService.createAndConvertToModel(newTrainingSession);
     }
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public TrainingSessionDTO updateTrainingSession(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody TrainingSessionDTORequest newTrainingSession) {
         return trainingSessionService.updateAndConvertToModel(id, newTrainingSession);
     }
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteTrainingSession(@PathVariable Long id) {
         trainingSessionService.deleteById(id);
         return ResponseEntity.noContent().build();

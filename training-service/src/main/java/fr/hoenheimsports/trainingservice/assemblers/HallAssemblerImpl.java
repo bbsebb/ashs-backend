@@ -6,6 +6,7 @@ import fr.hoenheimsports.trainingservice.dto.request.AddressDTORequest;
 import fr.hoenheimsports.trainingservice.dto.request.HallDTORequest;
 import fr.hoenheimsports.trainingservice.mappers.HallMapper;
 import fr.hoenheimsports.trainingservice.models.Hall;
+import fr.hoenheimsports.trainingservice.services.UserSecurityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -21,10 +22,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class HallAssemblerImpl implements HallAssembler {
     private final HallMapper hallMapper;
     private final PagedResourcesAssembler<Hall> pagedResourcesAssembler;
+    private final UserSecurityService userSecurityService;
 
-    public HallAssemblerImpl(HallMapper hallMapper, PagedResourcesAssembler<Hall> pagedResourcesAssembler) {
+    public HallAssemblerImpl(HallMapper hallMapper, PagedResourcesAssembler<Hall> pagedResourcesAssembler, UserSecurityService userSecurityService) {
         this.hallMapper = hallMapper;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
+        this.userSecurityService = userSecurityService;
     }
 
     @NonNull
@@ -51,17 +54,25 @@ public class HallAssemblerImpl implements HallAssembler {
     }
 
     private void addLinks(CollectionModel<HallDTO> resources) {
-        resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand()
-                .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country"))))) //skip default
-                .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")))))
-        );
+        resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
+        if(this.userSecurityService.hasRole("ADMIN")) {
+            resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand()
+                    .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country"))))) //skip default
+                    .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")))))
+            );
+        }
+
     }
 
     private void addLinks(HallDTO resource) {
-        resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel()
-                .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null))) //skip default
-                .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null)))
-                .andAffordance(afford(methodOn(HallControllerImpl.class).deleteHall(resource.getId()))));
+        resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel());
         resource.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
+        if(this.userSecurityService.hasRole("ADMIN")) {
+            resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel()
+                    .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null))) //skip default
+                    .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null)))
+                    .andAffordance(afford(methodOn(HallControllerImpl.class).deleteHall(resource.getId()))));
+        }
+
     }
 }

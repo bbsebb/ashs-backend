@@ -13,6 +13,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,18 +42,21 @@ public class TeamControllerImpl implements TeamController {
 
     @Override
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public TeamDTO createTeam(@Validated(OnCreate.class) @RequestBody TeamDTORequest newTeam) throws TrainingSessionNotFoundException, CoachNotFoundException, HallNotFoundException {
         return teamService.createAndConvertToModel(newTeam);
     }
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public TeamDTO updateTeam(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody TeamDTORequest newTeam) throws TeamNotFoundException, CoachNotFoundException, TrainingSessionNotFoundException, HallNotFoundException {
         return teamService.updateAndConvertToModel(id, newTeam);
     }
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteTeam(@PathVariable Long id) {
         teamService.deleteById(id);
         return ResponseEntity.noContent().build();

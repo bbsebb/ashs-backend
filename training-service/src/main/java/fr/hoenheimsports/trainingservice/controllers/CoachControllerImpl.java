@@ -10,6 +10,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,18 +39,21 @@ public class CoachControllerImpl implements CoachController {
 
     @Override
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public CoachDTO createCoach(@Validated(OnCreate.class) @RequestBody CoachDTORequest newCoach) {
         return coachService.createAndConvertToModel(newCoach);
     }
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public CoachDTO updateCoach(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody CoachDTORequest newCoach) {
         return coachService.updateAndConvertToModel(id, newCoach);
     }
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCoach(@PathVariable Long id) {
         coachService.deleteById(id);
         return ResponseEntity.noContent().build();
