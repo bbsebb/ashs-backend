@@ -20,6 +20,12 @@ spring:
     url: jdbc:tc:postgresql:latest:///test_database
     username: user
     password: password
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8079/realms/ashs # URL du realm Keycloak
+          jwk-set-uri: http://localhost:8079/realms/ashs/protocol/openid-connect/certs
 
 
 

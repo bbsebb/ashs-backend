@@ -1,6 +1,6 @@
 services:
   postgres-dev:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: devdb
       POSTGRES_USER: user

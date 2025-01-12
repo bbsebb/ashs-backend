@@ -1,2 +1,3 @@
 /.env
 /Encrypt spring config.http
+/instagram-service/src/main/resources/db/migration/V2_insert_token.sql
