@@ -60,23 +60,26 @@ public class TeamAssemblerImpl implements TeamAssembler {
     }
 
     private void addLinks(CollectionModel<TeamDTO> resources) {
-        resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withSelfRel());
+
         if(this.userSecurityService.hasRole("ADMIN")) {
             resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withSelfRel()
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDTORequest(1L, Gender.N, Category.SENIOR,1, Set.of(), Set.of())))) // skip default name
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDTORequest(1L, Gender.N, Category.SENIOR,1,Set.of(), Set.of()))))
             );
+        } else {
+            resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withSelfRel());
         }
     }
 
     private void addLinks(TeamDTO resource) {
-        resource.add(linkTo(methodOn(TeamControllerImpl.class).getTeamById(resource.getId())).withSelfRel());
         resource.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withRel("teams").expand());
         if(this.userSecurityService.hasRole("ADMIN")) {
             resource.add(linkTo(methodOn(TeamControllerImpl.class).getTeamById(resource.getId())).withSelfRel()
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).updateTeam(resource.getId(), null))) //skip default
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).updateTeam(resource.getId(), null)))
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).deleteTeam(resource.getId()))));
+        } else {
+            resource.add(linkTo(methodOn(TeamControllerImpl.class).getTeamById(resource.getId())).withSelfRel());
         }
     }
 }

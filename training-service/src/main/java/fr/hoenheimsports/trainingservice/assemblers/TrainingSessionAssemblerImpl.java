@@ -59,7 +59,6 @@ public class TrainingSessionAssemblerImpl implements TrainingSessionAssembler {
     }
 
     public void addLinks(TrainingSessionDTO resource) {
-        resource.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getTrainingSessionById(resource.getId())).withSelfRel());
         resource.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withRel("trainingSessions").expand());
         if(this.userSecurityService.hasRole("ADMIN")) {
             resource.add(
@@ -68,16 +67,20 @@ public class TrainingSessionAssemblerImpl implements TrainingSessionAssembler {
                             .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).updateTrainingSession(resource.getId(), null)))
                             .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).deleteTrainingSession(resource.getId())))
             );
+        } else {
+            resource.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getTrainingSessionById(resource.getId())).withSelfRel());
+
         }
     }
 
     public void addLinks(CollectionModel<TrainingSessionDTO> resources) {
-        resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel());
         if(this.userSecurityService.hasRole("ADMIN")) {
             var trainingSessionDtoRequest = new TrainingSessionDTORequest(1L,new TimeSlotDTORequest(DayOfWeek.MONDAY, LocalTime.now(), LocalTime.now()),new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")));
             resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel()
                     .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))) // skip default name
                     .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))));
+        } else {
+            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel());
         }
 
 

@@ -54,25 +54,28 @@ public class HallAssemblerImpl implements HallAssembler {
     }
 
     private void addLinks(CollectionModel<HallDTO> resources) {
-        resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
         if(this.userSecurityService.hasRole("ADMIN")) {
             resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand()
                     .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country"))))) //skip default
                     .andAffordance(afford(methodOn(HallControllerImpl.class).createHall(new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")))))
             );
+        } else {
+            resources.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
         }
 
     }
 
     private void addLinks(HallDTO resource) {
-        resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel());
-        resource.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
+
         if(this.userSecurityService.hasRole("ADMIN")) {
             resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel()
                     .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null))) //skip default
                     .andAffordance(afford(methodOn(HallControllerImpl.class).updateHall(resource.getId(), null)))
                     .andAffordance(afford(methodOn(HallControllerImpl.class).deleteHall(resource.getId()))));
+        } else {
+            resource.add(linkTo(methodOn(HallControllerImpl.class).getHallById(resource.getId())).withSelfRel());
         }
+        resource.add(linkTo(methodOn(HallControllerImpl.class).getAllHalls(Pageable.unpaged())).withRel("halls").expand());
 
     }
 }
