@@ -76,11 +76,11 @@ public class TrainingSessionAssemblerImpl implements TrainingSessionAssembler {
     public void addLinks(CollectionModel<TrainingSessionDTO> resources) {
         if(this.userSecurityService.hasRole("ADMIN")) {
             var trainingSessionDtoRequest = new TrainingSessionDTORequest(1L,new TimeSlotDTORequest(DayOfWeek.MONDAY, LocalTime.now(), LocalTime.now()),new HallDTORequest(1L, "name", new AddressDTORequest("street", "city", "postalCode", "country")));
-            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel()
+            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withRel("trainingSessions").expand()
                     .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))) // skip default name
                     .andAffordance(afford(methodOn(TrainingSessionControllerImpl.class).createTrainingSession(trainingSessionDtoRequest))));
         } else {
-            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withSelfRel());
+            resources.add(linkTo(methodOn(TrainingSessionControllerImpl.class).getAllTrainingSessions(Pageable.unpaged())).withRel("trainingSessions").expand());
         }
 
 

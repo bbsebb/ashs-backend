@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="base64-encoder-decoder">
-    <developerToolsConfigurations />
+  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="units-converter">
+    <developerToolsConfigurations>
+      <developerToolConfiguration developerToolId="jwt-encoder-decoder" id="bdef174b-5011-4892-84d0-2973b8377730" name="Workbench">
+        <properties>
+          <property key="encodedText" type="INPUT" value="kotlin.String|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI5NjQ5MmQ1OS0wYWQ1LTRjMDAtODkyZC01OTBhZDVhYzAwZjMiLCJzdWIiOiIwMTIzNDU2Nzg5IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNjgxMDQwNTE1fQ.p8DXyu99_K1XjwQZHiD4Y7EvrZOp12zsZdPdv5tAo8I" />
+        </properties>
+      </developerToolConfiguration>
+    </developerToolsConfigurations>
+    <expandedGroupNodeIds />
   </component>
 </project>

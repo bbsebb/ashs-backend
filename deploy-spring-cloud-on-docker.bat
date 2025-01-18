@@ -42,7 +42,7 @@ if /I "!doBuild!"=="y" (
 
             :: Build Docker image with the specified version and also tag it as latest
             echo Building Docker image for %%d with version latest
-            docker build --no-cache -t bbsebb/backend-%%d:1.0 .
+            docker build -t bbsebb/backend-%%d:1.0 .
             docker tag bbsebb/backend-%%d:1.0 bbsebb/backend-%%d:latest
 
 

@@ -62,12 +62,12 @@ public class TeamAssemblerImpl implements TeamAssembler {
     private void addLinks(CollectionModel<TeamDTO> resources) {
 
         if(this.userSecurityService.hasRole("ADMIN")) {
-            resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withSelfRel()
+            resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withRel("teams").expand()
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDTORequest(1L, Gender.N, Category.SENIOR,1, Set.of(), Set.of())))) // skip default name
                     .andAffordance(afford(methodOn(TeamControllerImpl.class).createTeam(new TeamDTORequest(1L, Gender.N, Category.SENIOR,1,Set.of(), Set.of()))))
             );
         } else {
-            resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withSelfRel());
+            resources.add(linkTo(methodOn(TeamControllerImpl.class).getAllTeams(Pageable.unpaged())).withRel("teams").expand());
         }
     }
 
