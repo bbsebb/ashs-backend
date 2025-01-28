@@ -10,8 +10,6 @@ services:
         tag: docker.gateway-service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-    networks:
-      - micro-service-network
     expose:
       - "8761"
     healthcheck:
@@ -34,8 +32,6 @@ services:
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:8888
       - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
-    networks:
-      - micro-service-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
       interval: 10s
@@ -60,8 +56,6 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:8888
-    networks:
-      - micro-service-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -84,8 +78,6 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:8888
-    networks:
-      - micro-service-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 10s
@@ -108,9 +100,6 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:8888
-    networks:
-      - micro-service-network
-      - instagram-network
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
       interval: 10s
@@ -138,9 +127,6 @@ services:
       - CONFIG_SERVICE_URL=http://config-service:8888
       - KC_ISSUER_URI=http://localhost:8079/realms/ashs
       - KC_JWK_SET_URI=http://keycloak:8079/realms/ashs/protocol/openid-connect/certs
-    networks:
-      - micro-service-network
-      - training-network
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
       interval: 10s
@@ -162,8 +148,6 @@ services:
       - "5432"
     volumes:
       - instagram_data:/var/lib/postgresql/data
-    networks:
-      - instagram-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U sa -d instagram_db" ]
       interval: 10s
@@ -181,8 +165,6 @@ services:
       - "5432"
     volumes:
       - training_data:/var/lib/postgresql/data
-    networks:
-        - training-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U sa -d training_db" ]
       interval: 10s
@@ -198,8 +180,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - kc-data:/var/lib/postgresql/data
-    networks:
-      - keycloak-network
+
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.8
@@ -222,9 +203,7 @@ services:
       - "8079"
     depends_on:
       - postgres-kc
-    networks:
-      - micro-service-network
-      - keycloak-network
+
 
 
 
@@ -233,8 +212,4 @@ volumes:
   training_data:
   kc-data:
 
-networks:
-  micro-service-network:
-  training-network:
-  instagram-network:
-  keycloak-network:
+
